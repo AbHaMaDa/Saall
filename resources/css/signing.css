@@ -1,0 +1,90 @@
+
+
+/* container */
+.signing-container   {
+    margin: 80px auto;
+    background-color: #fff;
+    color: #8c4614;
+    max-width: 420px;
+    width: 90%;
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.signing-container:hover  {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+}
+
+/* title */
+.signing-container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* form controls */
+.form-control {
+    width: 100%;
+    margin-bottom: 10px;
+    border: 2px solid #8c4614;
+    border-radius: 8px;
+    padding: 10px 12px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #732f0e;
+    box-shadow: 0 0 5px rgba(140,70,20,0.5);
+    outline: none;
+}
+
+/* submit button */
+.btn-signing {
+    background-color: #8c4614;
+    color: #fff;
+    border: none;
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-signing:hover {
+    background-color: #732f0e;
+    transform: translateY(-2px);
+}
+
+/* text under form */
+.form-text {
+    color: #8c4614;
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+a {
+    color: #8c4614;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* responsive */
+@media (max-width: 500px) {
+    .signing-container {
+        padding: 30px 20px;
+    }
+    .signing-container h2 {
+        font-size: 22px;
+    }
+}
