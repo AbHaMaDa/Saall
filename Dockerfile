@@ -24,6 +24,10 @@ RUN composer install --no-dev --optimize-autoloader
 # إعداد Laravel permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Build assets
+RUN npm install
+RUN npm run build
+
 # خلي Apache يوجّه للـ public folder
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
