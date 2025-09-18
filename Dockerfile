@@ -35,3 +35,5 @@ RUN echo '<VirtualHost *:80>\n\
 
 # Laravel app runs on port 80
 EXPOSE 80
+
+CMD ["apache2-foreground"]
