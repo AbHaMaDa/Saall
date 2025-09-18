@@ -4,19 +4,27 @@
 
 
 
-@section( 'content')
+@section('content')
     <div class="signing-container">
         <h2>تسجيل الدخول </h2>
-        <form action="" method="POST">
+        <form action="{{ route('Auth.login') }}" method="POST">
             @csrf
 
             <div class="mb-3">
                 <label for="email" class="form-label">البريد الإلكتروني</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="أدخل البريد الإلكتروني" required>
+                <input type="email" class="form-control" id="email" name="email" placeholder="أدخل البريد الإلكتروني"
+                    required>
+                @error('email')
+                    <div class="text-danger">{{ $message }}</div>
+                @enderror
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">كلمة المرور</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="أدخل كلمة المرور" required>
+                <input type="password" class="form-control" id="password" name="password" placeholder="أدخل كلمة المرور"
+                    required>
+                @error('password')
+                    <div class="text-danger">{{ $message }}</div>
+                @enderror
             </div>
 
             <button type="submit" class="btn btn-signing">تسجيل</button>
@@ -25,9 +33,3 @@
         </form>
     </div>
 @endsection
-
-
-
-
-
-

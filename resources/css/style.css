@@ -806,3 +806,12 @@ body {
         font-size: 0.95rem;
     }
 }
+
+
+.no-results {
+    text-align: center;
+    padding: 20px;
+    font-size: 16px;
+    color: #777;
+    font-weight: bold;
+}
