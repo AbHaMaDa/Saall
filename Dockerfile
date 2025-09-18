@@ -1,30 +1,28 @@
-# استخدم صورة PHP مع Apache
 FROM php:8.2-apache
 
-# فعل Apache mod_rewrite
-RUN a2enmod rewrite
-
-# حدد مجلد العمل
-WORKDIR /var/www/html
-
-# انسخ الملفات
-COPY . /var/www/html
-
-# نزّل Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-# نزّل المكتبات المطلوبة للـ Laravel
+# تثبيت الأدوات المطلوبة
 RUN apt-get update && apt-get install -y \
-    zip unzip git libpq-dev libonig-dev libzip-dev \
+    zip unzip git libpq-dev libonig-dev libzip-dev curl nodejs npm \
     && docker-php-ext-install pdo pdo_mysql mbstring zip
 
-# شغّل composer install
+# Apache mod_rewrite
+RUN a2enmod rewrite
+
+WORKDIR /var/www/html
+COPY . /var/www/html
+
+# Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev --optimize-autoloader
 
-# إعداد Laravel permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Build assets
+RUN npm install
+RUN npm run build
 
-# خلي Apache يوجّه للـ public folder
+# Permissions
+RUN chown -R www-data:www-data storage bootstrap/cache
+
+# Apache
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
     <Directory /var/www/html/public>\n\
@@ -33,6 +31,5 @@ RUN echo '<VirtualHost *:80>\n\
     </Directory>\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
-# Laravel app runs on port 80
 EXPOSE 80
-
+CMD ["apache2-foreground"]
