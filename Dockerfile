@@ -12,6 +12,11 @@ COPY . /var/www/html
 
 # نزّل Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# انسخ ملفات المشروع
+COPY . /var/www/html
+
+# انسخ ملف .env
+COPY .env /var/www/html/.env
 
 # نزّل المكتبات المطلوبة للـ Laravel
 RUN apt-get update && apt-get install -y \
@@ -36,4 +41,6 @@ RUN echo '<VirtualHost *:80>\n\
 
 # Laravel app runs on port 80
 EXPOSE 80
+
+
 
