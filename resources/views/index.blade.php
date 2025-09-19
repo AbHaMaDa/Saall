@@ -55,7 +55,6 @@
                 <h2>اطرح سؤالك</h2>
                 <form action="{{ route('questions.store') }}" id="question-form" method="POST">
                     @csrf
-
                     <div class="form-group">
                         <textarea id="question" name="content" placeholder="اكتب سؤالك هنا..." maxlength="800" required></textarea>
                         @error('content')
@@ -158,6 +157,7 @@
                                                             <button type="submit" class="btn btn-success">حفظ
                                                                 الإجابة</button>
                                                         @endif
+                                                    </div>
                                                 </form>
 
                                                 <form action={{ route('questions.destroy', $question['id']) }} method="POST">
@@ -199,5 +199,5 @@
     <div id="error-message" class="message error hidden">
         <span class="message-text"></span>
     </div>
-    </div>
+
 @endsection
