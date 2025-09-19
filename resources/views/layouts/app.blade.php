@@ -11,7 +11,7 @@
         href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap"rel="stylesheet">
     <meta charset="UTF-8">
 
-        <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+        <link rel="stylesheet" href="/assets/css/style.css">
 
 
 </head>
