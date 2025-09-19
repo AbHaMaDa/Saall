@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
     <nav class="app-navbar">
         <div class="container">
             <div class="brand">
