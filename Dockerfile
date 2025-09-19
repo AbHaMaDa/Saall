@@ -1,17 +1,14 @@
-# استخدم PHP مع Apache
+# استخدم صورة PHP مع Apache
 FROM php:8.2-apache
 
-# فعل mod_rewrite
+# فعل Apache mod_rewrite
 RUN a2enmod rewrite
 
 # حدد مجلد العمل
 WORKDIR /var/www/html
 
-# انسخ كل الملفات
+# انسخ الملفات
 COPY . /var/www/html
-
-# انسخ ملف .env
-COPY .env /var/www/html/.env
 
 # نزّل Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -25,8 +22,9 @@ RUN apt-get update && apt-get install -y \
 RUN composer install --no-dev --optimize-autoloader
 
 # إعداد Laravel permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+
 
 # خلي Apache يوجّه للـ public folder
 RUN echo '<VirtualHost *:80>\n\
@@ -37,8 +35,6 @@ RUN echo '<VirtualHost *:80>\n\
     </Directory>\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
-# اكسپوز البورت 80
+# Laravel app runs on port 80
 EXPOSE 80
 
-# الأمر الأساسي لتشغيل Apache
-CMD ["apache2-foreground"]
