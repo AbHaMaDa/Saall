@@ -10,10 +10,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap"rel="stylesheet">
     <meta charset="UTF-8">
-    <!-- Styles / Scripts -->
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/style.css', 'resources/js/script.js','resources/css/signing.css'])
-    @endif
+
+        <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+
+
 </head>
 
 
@@ -21,7 +21,7 @@
 
         @yield('content')
 
-
+    <script src="{{ asset('assets/js/script.js') }}"></script>
 </body>
 
 </html>
