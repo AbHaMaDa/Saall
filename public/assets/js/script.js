@@ -22,12 +22,7 @@ window.showTab = function (event, tabName) {
 
     currentTab = tabName;
 
-    // Load data based on tab
-    if (tabName === "answers") {
-        loadAnswers();
-    } else if (tabName === "admin" && isAdminLoggedIn) {
-        loadAdminQuestions();
-    }
+
 };
 
 // Question Management
