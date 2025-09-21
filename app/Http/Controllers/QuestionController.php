@@ -12,8 +12,11 @@ class QuestionController extends Controller
      */
     public function index()
     {
-        $questions = Question::all();
-        return view('index', compact('questions'));
+        $questions = Question::oldest('created_at')->get();
+        $answeredQuestions = Question::where('is_answered', true)->orderBy('created_at', 'asc')->get();
+
+        return view('index', compact('questions','answeredQuestions'));
+
     }
 
     /**

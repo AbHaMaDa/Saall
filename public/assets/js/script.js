@@ -88,16 +88,35 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 function showMessage(text, type) {
+    // جميع الرسائل
+    const allMessages = document.querySelectorAll('.message');
+
+    // 1. إخفاء كل الرسائل فورًا وإلغاء أي timeout
+    allMessages.forEach(msg => {
+        if (msg.timeoutId) {
+            clearTimeout(msg.timeoutId);
+            msg.timeoutId = null;
+        }
+        msg.classList.add('hidden');
+    });
+
+    // 2. اختيار الرسالة الجديدة
     const messageEl = document.getElementById(`${type}-message`);
     const textEl = messageEl.querySelector(".message-text");
 
+    // 3. تحديث النص
     textEl.textContent = text;
-    messageEl.classList.remove("hidden");
 
-    setTimeout(() => {
-        messageEl.classList.add("hidden");
+    // 4. إظهار الرسالة الجديدة
+    messageEl.classList.remove('hidden');
+
+    // 5. ضبط timeout لإخفاءها بعد 4 ثواني
+    messageEl.timeoutId = setTimeout(() => {
+        messageEl.classList.add('hidden');
+        messageEl.timeoutId = null;
     }, 4000);
 }
+
 
 document.addEventListener("DOMContentLoaded", function () {
     const toggle = document.getElementById("nav-toggle");

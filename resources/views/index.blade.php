@@ -2,34 +2,43 @@
 
 @section('content')
 
-    <nav class="app-navbar">
-        <div class="container">
+    <nav class="app-navbar navbar navbar-expand-lg ">
+        <div class="container d-flex justify-content-between align-items-center">
+            <!-- Brand / Logo -->
             <div class="brand">
-                <!-- ضع ملف اللوجو في public/images/logo.png أو غيّر المسار -->
-                <a href="" class="brand-link" aria-label="الرئيسية">
-                    <img src="{{ asset('/icon2.png') }}" alt="سَل" class="brand-logo">
+                <a href="/index" class="brand-link navbar-brand" aria-label="الرئيسية">
+                    <img src="{{ asset('/logo.jpeg') }}" alt="سَل" class="brand-logo">
                 </a>
             </div>
 
+            <!-- Toggler button (show only if user not logged in) -->
 
-            <div id="nav-menu" class="nav-menu" role="menu">
-                <div class="auth-actions">
-                    @if (!Auth::user())
-                        <a href="/login" class="btn btn-signin">تسجيل الدخول</a>
+            @if (!Auth::user())
+                <button class="navbar-toggler nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#nav-menu"
+                    aria-controls="nav-menu" aria-expanded="false" aria-label="قائمة">
+                    <span class="hamburger navbar-toggler-icon"></span>
+                </button>
+            @else
+                <button class=" btn-signin" data-bs-toggle="modal" data-bs-target="#exampleModallogout">
+                    <img src="logout.jpeg" alt="signout" class="brand-logo">
+                </button>
+            @endif
+
+            <!-- Nav menu -->
+            @if (!Auth::user())
+                <div id="nav-menu" class="nav-menu collapse navbar-collapse" role="menu">
+                    <div class="auth-actions d-flex">
+                        <a href="/login" class="btn btn-signin me-2">تسجيل الدخول</a>
                         <a href="/register" class="btn btn-signup">تسجّل حساب جديد</a>
-                    @else
-                        <a href="{{ route('Auth.logout') }}" class="btn btn-signin">تسجيل خروج</a>
-                    @endif
-
-
+                    </div>
                 </div>
-            </div>
-            <button id="nav-toggle" class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="قائمة">
-                <span class="hamburger"></span>
-            </button>
+            @endif
 
         </div>
     </nav>
+
+
+
 
     <div class="container">
         <!-- Header -->
@@ -82,7 +91,7 @@
                 </div>
             </form>
             <div id="answers-container">
-                @if ($questions->count() > 0)
+                @if ($answeredQuestions->count() > 0)
                     @foreach ($questions as $question)
                         @if ($question['is_answered'] == true)
                             <div class="answer-item">
@@ -94,7 +103,13 @@
                                     <span class="answer-label">الإجابة:</span>
                                     <div class="answer-text">{{ $question['answer'] }}</div>
                                 </div>
-                                <div class="answer-meta">
+                                <div class="answer-meta d-flex justify-content-between align-items-center">
+                                    @auth
+                                        @if (Auth::user()->privilege_level === 2)
+                                            <i class="fa-solid fa-trash icon-trash" data-bs-toggle="modal"
+                                                data-bs-target="#exampleModalDeleteUnanswer{{ $question['id'] }}"></i>
+                                        @endif
+                                    @endauth
                                     <span class="answer-date">{{ $question['created_at'] }}</span>
                                 </div>
                             </div>
@@ -122,55 +137,43 @@
                             </div>
                             @if ($questions->count() > 0)
                                 @foreach ($questions as $question)
-                                    <div id="admin-questions" class="admin-questions">
-                                        <!-- Admin questions will be displayed here -->
-                                        <div class="admin-question-item @if (!$question['is_answered'] == true) unanswered @endif">
-                                            <div class="admin-question-header">
-                                                <div class="admin-question-info">
-                                                    <div class="admin-question-text">{{ $question['content'] }}</div>
-                                                    <div class="admin-question-meta">
-                                                        {{ $question['created_at'] }}
-                                                        @if ($question['is_answered'] == true)
-                                                            | <strong>تم الرد</strong>
-                                                        @else
+                                    @if ($question['is_answered'] == false)
+                                        <div id="admin-questions" class="admin-questions">
+                                            <!-- Admin questions will be displayed here -->
+                                            <div class="admin-question-item unanswered">
+                                                <div class="admin-question-header">
+                                                    <div class="admin-question-info">
+                                                        <div class="admin-question-text">{{ $question['content'] }}</div>
+                                                        <div class="admin-question-meta">
+                                                            {{ $question['created_at'] }}
                                                             | <strong>لم يتم الرد</strong>
-                                                        @endif
-
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="admin-answer-section">
-                                                <form action="{{ route('questions.update', $question->id) }}" method="POST">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    @if (!$question['is_answered'] == true)
+                                                <div class="admin-answer-section">
+                                                    <form action="{{ route('questions.update', $question->id) }}"
+                                                        method="POST">
+                                                        @csrf
+                                                        @method('PUT')
                                                         <textarea id="answer-mfo8361a3ug8ylu88uy" name="answer" placeholder="اكتب الإجابة هنا..."></textarea>
-                                                    @else
-                                                        <div
-                                                            style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0;">
-                                                            {{ $question['answer'] }}
-                                                        </div>
-                                                    @endif
-                                                    <div class="admin-actions">
-                                                        @if (!$question['is_answered'] == true)
+                                                        <div class="admin-actions">
                                                             <button type="submit" class="btn btn-success">حفظ
                                                                 الإجابة</button>
-                                                        @endif
-                                                    </div>
-                                                </form>
+                                                            <a class="btn btn-danger" data-bs-toggle="modal"
+                                                                data-bs-target="#exampleModalDeleteUnanswer{{ $question['id'] }}">حذف
+                                                                السؤال</a>
 
-                                                <form action={{ route('questions.destroy', $question['id']) }} method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">حذف
-                                                        السؤال</button>
-                                                </form>
+
+                                                        </div>
+                                                    </form>
+
+
+                                                </div>
 
                                             </div>
-
                                         </div>
-                                    </div>
+                                    @endif
                                 @endforeach
                             @else
                                 <div class="empty-state">
@@ -188,8 +191,6 @@
         @endauth
     </div>
 
-
-
     <!-- Success Message -->
     <div id="success-message" class="message success hidden">
         <span class="message-text"></span>
@@ -199,5 +200,55 @@
     <div id="error-message" class="message error hidden">
         <span class="message-text"></span>
     </div>
+
+    <!-- Modal logout -->
+    <div class="modal fade" id="exampleModallogout" tabindex="-1" aria-labelledby="exampleModalLabellogout"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h1 class="modal-title fs-5" id="exampleModalLabellogout">تسجيل الخروح </h1>
+                </div>
+                <div class="modal-body">
+                    هل أنت متأكد أنك تريد تسجيل الخروج؟
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <a href="{{ route('Auth.logout') }}" class="btn btn-primary">تسجيل الخروج</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @foreach ($questions as $question)
+        <!-- Modal deleteUnanswer -->
+        <div class="modal fade" id="exampleModalDeleteUnanswer{{ $question['id'] }}" tabindex="-1"
+            aria-labelledby="exampleModalDeleteUnanswer{{ $question['id'] }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h1 class="modal-title fs-5" id="exampleModalDeleteUnanswer{{ $question['id'] }}">حذف السؤال
+                        </h1>
+                    </div>
+                    <div class="modal-body">
+                        هل أنت متأكد أنك تريد حذف السؤال؟
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                        <form action={{ route('questions.destroy', $question['id']) }} method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger">حذف
+                                السؤال</button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
 
 @endsection
