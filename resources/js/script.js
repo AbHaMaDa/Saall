@@ -1,6 +1,6 @@
 // نفس الـ JavaScript السابق بدون أي تغيير
 // Application State
-let currentTab = "ask";
+let currentTab = "ask"; // تبويب افتراضي
 
 // Tab Management
 window.showTab = function (event, tabName) {
@@ -17,18 +17,25 @@ window.showTab = function (event, tabName) {
     // Show selected tab
     document.getElementById(`${tabName}-tab`).classList.add("active");
 
-    // Add active class to clicked button
-    event.target.classList.add("active");
+    // Add active class to clicked button أو للزر المناسب لو event مش موجود
+    const btn = event?.target || document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+    if (btn) btn.classList.add("active");
+
+    // حفظ آخر تبويب تم اختياره
+    localStorage.setItem("lastActiveTab", tabName);
 
     currentTab = tabName;
-
-    // Load data based on tab
-    if (tabName === "answers") {
-        loadAnswers();
-    } else if (tabName === "admin" && isAdminLoggedIn) {
-        loadAdminQuestions();
-    }
 };
+
+// عند تحميل الصفحة
+document.addEventListener("DOMContentLoaded", () => {
+    const lastTab = localStorage.getItem("lastActiveTab") || currentTab;
+    showTab(null, lastTab); // تمرير null كـ event
+});
+
+
+
+
 
 // Question Management
 document.addEventListener("DOMContentLoaded", function () {
@@ -60,47 +67,65 @@ document.addEventListener("DOMContentLoaded", function () {
         // Prepare form data
         const formData = new FormData();
         formData.append("content", question);
-        formData.append("_token", document.querySelector('input[name="_token"]').value);
+        formData.append(
+            "_token",
+            document.querySelector('input[name="_token"]').value
+        );
 
         fetch(form.action, {
             method: "POST",
             body: formData,
             headers: {
-                Accept: "application/json"
-            }
+                Accept: "application/json",
+            },
         })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.errors && data.errors.content) {
-                showMessage(data.errors.content[0], "error");
-            } else {
-                showMessage(
-                    "تم إرسال سؤالك بنجاح. سيتم الرد عليه قريباً إن شاء الله",
-                    "success"
-                );
-                form.reset();
-                charCount.textContent = "0";
-            }
-        })
-        .catch((error) => {
-            console.error(error);
-            showMessage("حدث خطأ أثناء إرسال السؤال", "error");
-        });
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.errors && data.errors.content) {
+                    showMessage(data.errors.content[0], "error");
+                } else {
+                    showMessage(
+                        "تم إرسال سؤالك بنجاح. سيتم الرد عليه قريباً إن شاء الله",
+                        "success"
+                    );
+                    form.reset();
+                    charCount.textContent = "0";
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+                showMessage("حدث خطأ أثناء إرسال السؤال", "error");
+            });
     });
 });
 
-
-
-
 function showMessage(text, type) {
+    // جميع الرسائل
+    const allMessages = document.querySelectorAll(".message");
+
+    // 1. إخفاء كل الرسائل فورًا وإلغاء أي timeout
+    allMessages.forEach((msg) => {
+        if (msg.timeoutId) {
+            clearTimeout(msg.timeoutId);
+            msg.timeoutId = null;
+        }
+        msg.classList.add("hidden");
+    });
+
+    // 2. اختيار الرسالة الجديدة
     const messageEl = document.getElementById(`${type}-message`);
     const textEl = messageEl.querySelector(".message-text");
 
+    // 3. تحديث النص
     textEl.textContent = text;
+
+    // 4. إظهار الرسالة الجديدة
     messageEl.classList.remove("hidden");
 
-    setTimeout(() => {
+    // 5. ضبط timeout لإخفاءها بعد 4 ثواني
+    messageEl.timeoutId = setTimeout(() => {
         messageEl.classList.add("hidden");
+        messageEl.timeoutId = null;
     }, 4000);
 }
 
@@ -113,47 +138,90 @@ document.addEventListener("DOMContentLoaded", function () {
         toggle.addEventListener("click", function () {
             const open = menu.classList.toggle("mobile-open");
             toggle.setAttribute("aria-expanded", open ? "true" : "false");
-            if (open) {
-                header.style.marginTop = "100px";
-            } else {
-                header.style.marginTop = "0";
-            }
+            header.style.marginTop = open ? "100px" : "0";
         });
 });
 
+let token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
 
-document.getElementById("searchForm").addEventListener("submit", function(e) {
-    e.preventDefault(); // prevent refresh
+document.getElementById("searchForm").addEventListener("submit", function (e) {
+    e.preventDefault();
 
-    let query = document.getElementById("search-input").value;
+    const query = document.getElementById("search-input").value;
 
     fetch(`/search?search=${encodeURIComponent(query)}`)
         .then(res => res.json())
         .then(data => {
-            let container = document.getElementById("answers-container");
+            const container = document.getElementById("answers-container");
             container.innerHTML = "";
-
-            if (data.length === 0) {
+            const answeredQuestions = data.questions.filter(q => q.is_answered == 1);
+            if (answeredQuestions.length === 0) {
                 container.innerHTML = "<p>لا توجد نتائج مطابقة.</p>";
-            } else {
-                data.forEach(q => {
-                    container.innerHTML += `
-                        <div class="answer-item">
-                            <div class="question-section">
-                                <span class="question-label">السؤال:</span>
-                                <div class="question-text">${q.content}</div>
-                            </div>
-                            <div class="answer-section">
-                                <span class="answer-label">الإجابة:</span>
-                                <div class="answer-text">${q.answer}</div>
-                            </div>
-                            <div class="answer-meta">
-                                <span class="answer-date">${q.created_at}</span>
+                return;
+            }
+
+            const isAdmin = data.user?.privilege_level === 2; // <-- هنا
+
+            data.questions.forEach(q => {
+                if (q.is_answered != 1) return;
+
+                const trashIcon = isAdmin
+                    ? `<i class="fa-solid fa-trash icon-trash" data-bs-toggle="modal" data-bs-target="#exampleModalDeleteUnanswer${q.id}"></i>`
+                    : "";
+
+
+
+                container.innerHTML += `
+                    <div class="answer-item">
+                        <div class="question-section">
+                            <span class="question-label">السؤال:</span>
+                            <div class="question-text">${q.content}</div>
+                        </div>
+                        <div class="answer-section">
+                            <span class="answer-label">الإجابة:</span>
+                            <div class="answer-text">${q.answer}</div>
+                        </div>
+                        <div class="answer-meta d-flex justify-content-between align-items-center">
+                            ${trashIcon}
+                            <span class="answer-date">${q.created_at}</span>
+                        </div>
+                    </div>
+                    ${isAdmin ? `
+                    <div class="modal fade" id="exampleModalDeleteUnanswer${q.id}" tabindex="-1" aria-labelledby="exampleModalDeleteUnanswer${q.id}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    <h1 class="modal-title fs-5">حذف السؤال</h1>
+                                </div>
+                                <div class="modal-body">
+                                    هل أنت متأكد أنك تريد حذف السؤال؟
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                                    <form class="model-form" action="/questions/${q.id}" method="POST">
+                                        <input type="hidden" name="_token" value="${token}">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button type="submit" class="btn btn-danger">حذف السؤال</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    `;
-                });
-            }
+                    </div>`:""}
+                `;
+            });
         })
         .catch(err => console.error("Error:", err));
 });
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const flashMsg = document.getElementById("flash-message");
+        if (flashMsg) {
+            setTimeout(() => {
+                flashMsg.classList.add("hide");
+                // بعد ما يخلص الانتقال نشيله من الـ DOM
+                setTimeout(() => flashMsg.remove(), 500);
+            }, 4000); // بعد ٤ ثواني يبدأ يختفي
+        }
+    });

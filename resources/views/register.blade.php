@@ -10,7 +10,7 @@
 
 
 
-        <h2>تسجيل حساب جديد</h2>
+        <h2> طلب الانضمام للادارة </h2>
         <form action="{{ route('Auth.register') }}" method="POST">
             @csrf
             <div class="mb-3 ">
@@ -43,7 +43,7 @@
                     placeholder="أعد إدخال كلمة المرور" value="{{ old('password_confirmation') }}" required>
             </div>
             <button type="submit" class="btn btn-signing">تسجيل</button>
-            <p class="form-text mt-3">لديك حساب؟ <a href="/login">تسجيل الدخول</a></p>
+            <p class="form-text mt-3">لديك حساب اداري ؟ <a href="/login">تسجيل الدخول</a></p>
             <p class="form-text mt-3"><a href="/index">الصفحة الرئيسية</a></p>
 
         </form>

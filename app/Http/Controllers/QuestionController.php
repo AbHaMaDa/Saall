@@ -16,8 +16,10 @@ class QuestionController extends Controller
     {
         $questions = Question::oldest('created_at')->get();
         $answeredQuestions = Question::where('is_answered', true)->orderBy('created_at', 'asc')->get();
+        $unAnsweredQuestions = Question::where('is_answered', false)->orderBy('created_at', 'asc')->get();
 
-        return view('index', compact('questions', 'answeredQuestions'));
+
+        return view('index', compact('questions', 'answeredQuestions','unAnsweredQuestions'));
     }
 
     /**
@@ -34,7 +36,7 @@ class QuestionController extends Controller
     public function store(Request $request)
     {
         $fields = $request->validate([
-            'content' => 'required|string|max:800',
+            'content' => 'required|string|max:1000',
         ]);
 
         Question::create($fields);
@@ -101,7 +103,7 @@ class QuestionController extends Controller
         return response()->json([
             'questions' => $questions,
             'user' => $user,
-            'answeredQuestions'=>$answeredQuestions
+            'answeredQuestions' => $answeredQuestions
         ]);
     }
 }

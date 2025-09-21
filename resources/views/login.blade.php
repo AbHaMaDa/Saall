@@ -6,7 +6,7 @@
 
 @section('content')
     <div class="signing-container">
-        <h2>تسجيل الدخول </h2>
+        <h2> دخول الادارة  </h2>
         <form action="{{ route('Auth.login') }}" method="POST">
             @csrf
 
@@ -28,7 +28,7 @@
             </div>
 
             <button type="submit" class="btn btn-signing">تسجيل</button>
-            <p class="form-text mt-3">ليس لديك حساب؟ <a href="/register"> !سجل الان</a></p>
+            <p class="form-text mt-3">هل تريد الانضمام لدينا ؟<a href="/register"> سجل الان !</a></p>
             <p class="form-text mt-3"><a href="/index">الصفحة الرئيسية</a></p>
         </form>
     </div>

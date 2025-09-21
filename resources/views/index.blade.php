@@ -3,10 +3,10 @@
 @section('content')
 
     <nav class="app-navbar navbar navbar-expand-lg ">
-        <div class="container d-flex justify-content-between align-items-center">
+        <div class="container ">
             <!-- Brand / Logo -->
             <div class="brand">
-                <a href="/index" class="brand-link navbar-brand" aria-label="الرئيسية">
+                <a href="/index" class="brand-link" aria-label="الرئيسية">
                     <img src="{{ asset('/logo.jpeg') }}" alt="سَل" class="brand-logo">
                 </a>
             </div>
@@ -14,17 +14,16 @@
             <!-- Toggler button (show only if user not logged in) -->
 
             @if (!Auth::user())
-                <button class="navbar-toggler nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#nav-menu"
-                    aria-controls="nav-menu" aria-expanded="false" aria-label="قائمة">
-                    <span class="hamburger navbar-toggler-icon"></span>
-                </button>
+                <a href="/login" >
+                    <img src="{{ asset('/join.jpeg') }}" alt="join" class="brand-logo">
+                </a>
             @else
                 <button class=" btn-signin" data-bs-toggle="modal" data-bs-target="#exampleModallogout">
                     <img src="logout.jpeg" alt="signout" class="brand-logo">
                 </button>
             @endif
 
-            <!-- Nav menu -->
+            {{-- <!-- Nav menu -->
             @if (!Auth::user())
                 <div id="nav-menu" class="nav-menu collapse navbar-collapse" role="menu">
                     <div class="auth-actions d-flex">
@@ -32,7 +31,7 @@
                         <a href="/register" class="btn btn-signup">تسجّل حساب جديد</a>
                     </div>
                 </div>
-            @endif
+            @endif --}}
 
         </div>
     </nav>
@@ -49,11 +48,11 @@
 
         <!-- Navigation Tabs -->
         <nav class="nav-tabs">
-            <button class="tab-btn active" onclick="showTab(event, 'ask')">إرسال سؤال</button>
-            <button class="tab-btn" onclick="showTab(event, 'answers')">الإجابات</button>
+            <button class="tab-btn active" data-tab="ask" onclick="showTab(event, 'ask')">إرسال سؤال</button>
+            <button class="tab-btn" data-tab="answers" onclick="showTab(event, 'answers')">الإجابات</button>
             @auth
                 @if (Auth::user()->privilege_level === 2)
-                    <button class="tab-btn" onclick="showTab(event, 'admin')">الإدارة</button>
+                    <button class="tab-btn" data-tab="admin" onclick="showTab(event, 'admin')">الإدارة</button>
                 @endif
             @endauth
         </nav>
@@ -65,17 +64,17 @@
                 <form action="{{ route('questions.store') }}" id="question-form" method="POST">
                     @csrf
                     <div class="form-group">
-                        <textarea id="question" name="content" placeholder="اكتب سؤالك هنا..." maxlength="800" required></textarea>
+                        <textarea id="question" name="content" placeholder="اكتب سؤالك هنا..." maxlength="1000" required></textarea>
                         @error('content')
                             <div class="text-danger">{{ $message }}</div>
                         @enderror
                         <div class="char-counter">
-                            <span id="char-count">0</span> / 800 حرف
+                            <span id="char-count">0</span> / 1000 حرف
                         </div>
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">إرسال السؤال</button>
+                        <button type="submit" class="btn btn-primary">إرسال </button>
                     </div>
                 </form>
             </div>
@@ -135,7 +134,7 @@
                             <div class="admin-header">
                                 <h2>إدارة الأسئلة</h2>
                             </div>
-                            @if ($questions->count() > 0)
+                            @if ($unAnsweredQuestions->count() > 0)
                                 @foreach ($questions as $question)
                                     @if ($question['is_answered'] == false)
                                         <div id="admin-questions" class="admin-questions">
@@ -200,6 +199,13 @@
     <div id="error-message" class="message error hidden">
         <span class="message-text"></span>
     </div>
+
+        <!-- pending Message -->
+@if(session('status'))
+    <div id="flash-message" class="message pending">
+        <span class="message-text">{{ session('status') }}</span>
+    </div>
+@endif
 
     <!-- Modal logout -->
     <div class="modal fade" id="exampleModallogout" tabindex="-1" aria-labelledby="exampleModalLabellogout"

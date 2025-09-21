@@ -27,7 +27,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect('/index')->with('success', 'Registration successful. Please login.');
+        return redirect('/index')->with('status', 'تم ارسال طلبك بنجاح و سيتم مراجعته قريبا');
     }
 
 
@@ -62,6 +62,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login')->with('success', 'Logged out successfully.');
+        return redirect('/index')->with('success', 'Logged out successfully.');
     }
 }

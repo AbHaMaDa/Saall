@@ -1,6 +1,6 @@
 // نفس الـ JavaScript السابق بدون أي تغيير
 // Application State
-let currentTab = "ask";
+let currentTab = "ask"; // تبويب افتراضي
 
 // Tab Management
 window.showTab = function (event, tabName) {
@@ -17,11 +17,25 @@ window.showTab = function (event, tabName) {
     // Show selected tab
     document.getElementById(`${tabName}-tab`).classList.add("active");
 
-    // Add active class to clicked button
-    event.target.classList.add("active");
+    // Add active class to clicked button أو للزر المناسب لو event مش موجود
+    const btn = event?.target || document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+    if (btn) btn.classList.add("active");
+
+    // حفظ آخر تبويب تم اختياره
+    localStorage.setItem("lastActiveTab", tabName);
 
     currentTab = tabName;
 };
+
+// عند تحميل الصفحة
+document.addEventListener("DOMContentLoaded", () => {
+    const lastTab = localStorage.getItem("lastActiveTab") || currentTab;
+    showTab(null, lastTab); // تمرير null كـ event
+});
+
+
+
+
 
 // Question Management
 document.addEventListener("DOMContentLoaded", function () {
@@ -201,3 +215,13 @@ document.getElementById("searchForm").addEventListener("submit", function (e) {
 });
 
 
+    document.addEventListener("DOMContentLoaded", () => {
+        const flashMsg = document.getElementById("flash-message");
+        if (flashMsg) {
+            setTimeout(() => {
+                flashMsg.classList.add("hide");
+                // بعد ما يخلص الانتقال نشيله من الـ DOM
+                setTimeout(() => flashMsg.remove(), 500);
+            }, 4000); // بعد ٤ ثواني يبدأ يختفي
+        }
+    });
