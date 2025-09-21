@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تطبيق سَل - للأسئلة والفتاوى</title>
     <link rel="icon" type="image/x-icon" href="icon2.png">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link
         href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap"rel="stylesheet">
@@ -23,6 +24,7 @@
 <body>
 
     @yield('content')
+    <script src="bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/script.js"></script>
 

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Question;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class QuestionController extends Controller
 {
@@ -15,8 +17,7 @@ class QuestionController extends Controller
         $questions = Question::oldest('created_at')->get();
         $answeredQuestions = Question::where('is_answered', true)->orderBy('created_at', 'asc')->get();
 
-        return view('index', compact('questions','answeredQuestions'));
-
+        return view('index', compact('questions', 'answeredQuestions'));
     }
 
     /**
@@ -93,8 +94,14 @@ class QuestionController extends Controller
         $questions = Question::where('content', 'LIKE', "%{$search}%")
             ->orWhere('answer', 'LIKE', "%{$search}%")
             ->get();
+        $answeredQuestions = Question::where('is_answered', true)->orderBy('created_at', 'asc')->get();
 
+        $user = Auth::user();
 
-        return response()->json($questions);
+        return response()->json([
+            'questions' => $questions,
+            'user' => $user,
+            'answeredQuestions'=>$answeredQuestions
+        ]);
     }
 }
