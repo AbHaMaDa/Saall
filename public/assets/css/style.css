@@ -100,6 +100,11 @@ body {
     border: 1px solid transparent;
 }
 
+.btn:hover{
+    background-color:#f7f9fa;
+    border-color: #f7f9fa;
+}
+
 /* Sign in: transparent */
 .btn-signin {
     color: var(--white);
