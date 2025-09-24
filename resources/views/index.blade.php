@@ -201,7 +201,7 @@
                                                         method="POST">
                                                         @csrf
                                                         @method('PUT')
-                                                        <textarea id="answer-mfo8361a3ug8ylu88uy" name="answer" placeholder="اكتب الإجابة هنا..."></textarea>
+                                                        <textarea id="answer-mfo8361a3ug8ylu88uy" name="answer" placeholder="اكتب الإجابة هنا..." required></textarea>
                                                         <div class="admin-actions">
                                                             <button type="submit" class="btn btn-success">حفظ
                                                                 الإجابة</button>
