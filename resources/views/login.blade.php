@@ -7,7 +7,7 @@
 @section('content')
     <div class="signing-container">
         <h2> دخول الادارة </h2>
-        <p class="text-center" style="font-size: 0.9rem; color: #bbb;">الادارة خاصة بالشيوخ و المسؤلين</p>
+        <p class="text-center" style="font-size: 0.9rem; color: #bbb;">الإدارة خاصة بالشيخ و المسؤلين فقط .</p>
         <form action="{{ route('Auth.login') }}" method="POST">
             @csrf
 
@@ -29,7 +29,7 @@
             </div>
 
             <button type="submit" class="btn btn-signing">تسجيل</button>
-            <p class="form-text mt-3">طلب الانضمام للادارة .<a href="/register"> طلب ! </a></p>
+            <p class="form-text mt-3"><a href="/register">طلب الإنضمام للادارة ! </a></p>
             <p class="form-text mt-3"><a href="/index">الصفحة الرئيسية</a></p>
         </form>
     </div>

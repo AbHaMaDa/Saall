@@ -160,31 +160,45 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 });
 
-const token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+const token = document
+    .querySelector('meta[name="csrf-token"]')
+    .getAttribute("content");
 
 // العام
-document.getElementById("searchFormPublic").addEventListener("submit", function (e) {
-    e.preventDefault();
-    const query = document.getElementById("search-input-public").value;
-    fetchAnswers(`/search?search=${encodeURIComponent(query)}`, "answers-container-public");
-});
+document
+    .getElementById("searchFormPublic")
+    .addEventListener("submit", function (e) {
+        e.preventDefault();
+        const query = document.getElementById("search-input-public").value;
+        fetchAnswers(
+            `/search?search=${encodeURIComponent(query)}`,
+            "answers-container-public"
+        );
+    });
 
 // الخاص
-document.getElementById("searchFormMine").addEventListener("submit", function (e) {
-    e.preventDefault();
-    const query = document.getElementById("search-input-mine").value;
-    fetchAnswers(`/search/visitor?search=${encodeURIComponent(query)}`, "answers-container-mine");
-});
+document
+    .getElementById("searchFormMine")
+    .addEventListener("submit", function (e) {
+        e.preventDefault();
+        const query = document.getElementById("search-input-mine").value;
+        fetchAnswers(
+            `/search/visitor?search=${encodeURIComponent(query)}`,
+            "answers-container-mine"
+        );
+    });
 
 // دالة عامة لعرض النتائج
 function fetchAnswers(url, containerId) {
     fetch(url)
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
             const container = document.getElementById(containerId);
             container.innerHTML = "";
 
-            const answeredQuestions = data.questions.filter(q => q.is_answered == 1);
+            const answeredQuestions = data.questions.filter(
+                (q) => q.is_answered == 1
+            );
             if (answeredQuestions.length === 0) {
                 container.innerHTML = "<p>لا توجد نتائج مطابقة.</p>";
                 return;
@@ -192,7 +206,7 @@ function fetchAnswers(url, containerId) {
 
             const isAdmin = data.user?.privilege_level === 2;
 
-            answeredQuestions.forEach(q => {
+            answeredQuestions.forEach((q) => {
                 const trashIcon = isAdmin
                     ? `<i class="fa-solid fa-trash icon-trash" data-bs-toggle="modal" data-bs-target="#exampleModalDeleteUnanswer${q.id}"></i>`
                     : "";
@@ -210,10 +224,12 @@ function fetchAnswers(url, containerId) {
                         </div>
                         <div class="answer-meta d-flex justify-content-between align-items-center">
                             ${trashIcon}
-                            <span class="answer-date">${dateObj.toLocaleDateString()} ${dateObj.toLocaleTimeString()}</span>
+                            <span class="answer-date">${dateObj.toLocaleDateString()}  \\\  ${dateObj.toLocaleTimeString()}</span>
                         </div>
                     </div>
-                    ${isAdmin ? `
+                    ${
+                        isAdmin
+                            ? `
                     <div class="modal fade" id="exampleModalDeleteUnanswer${q.id}" tabindex="-1" aria-labelledby="exampleModalDeleteUnanswer${q.id}" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -234,19 +250,14 @@ function fetchAnswers(url, containerId) {
                                 </div>
                             </div>
                         </div>
-                    </div>` : ""}
+                    </div>`
+                            : ""
+                    }
                 `;
             });
         })
-        .catch(err => console.error("Error:", err));
+        .catch((err) => console.error("Error:", err));
 }
-
-
-
-
-
-
-
 
 document.addEventListener("DOMContentLoaded", function () {
     const allBtn = document.getElementById("all");
@@ -254,9 +265,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const publicSearch = document.querySelector(".public-search");
     const mineSearch = document.querySelector(".mine-search");
 
-
-    allBtn.addEventListener("click", () => toggleAnswers("all"));
-    mineBtn.addEventListener("click", () => toggleAnswers("mine"));
+    allBtn.addEventListener("click", () => {
+        toggleAnswers("all");
+        localStorage.setItem("Qtab", "all");
+    });
+    mineBtn.addEventListener("click", () => {
+        toggleAnswers("mine");
+        localStorage.setItem("Qtab", "mine");
+    });
 
     function toggleAnswers(type) {
         const publicContainer = document.getElementById(
@@ -272,10 +288,10 @@ document.addEventListener("DOMContentLoaded", function () {
             mineSearch.classList.add("hidden");
 
             // تحديث الأزرار
-            allBtn.classList.add("btn-light");
-            allBtn.classList.remove("btn-primary");
-            mineBtn.classList.add("btn-primary");
-            mineBtn.classList.remove("btn-light");
+            allBtn.classList.remove("btn-light");
+            allBtn.classList.add("btn-primary");
+            mineBtn.classList.remove("btn-primary");
+            mineBtn.classList.add("btn-light");
         } else {
             publicContainer.classList.add("hidden");
             mineContainer.classList.remove("hidden");
@@ -283,13 +299,14 @@ document.addEventListener("DOMContentLoaded", function () {
             mineSearch.classList.remove("hidden");
 
             // تحديث الأزرار
-            mineBtn.classList.add("btn-light");
-            mineBtn.classList.remove("btn-primary");
-            allBtn.classList.add("btn-primary");
-            allBtn.classList.remove("btn-light");
+            mineBtn.classList.remove("btn-light");
+            mineBtn.classList.add("btn-primary");
+            allBtn.classList.remove("btn-primary");
+            allBtn.classList.add("btn-light");
         }
     }
 
     // تفعيل التبويب الافتراضي عند تحميل الصفحة
-    toggleAnswers("all");
+    const savedTab = localStorage.getItem("Qtab");
+    toggleAnswers(savedTab);
 });

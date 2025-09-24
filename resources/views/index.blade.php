@@ -14,7 +14,7 @@
             <!-- Toggler button (show only if user not logged in) -->
 
             @if (!Auth::user())
-                <a href="/login" >
+                <a href="/login">
                     <img src="{{ asset('/join.jpeg') }}" alt="join" class="brand-logo">
                 </a>
             @else
@@ -85,45 +85,46 @@
             <form action="{{ route('questions.search') }}" method="GET" id="searchFormPublic" class="public-search">
                 <div class="search-box">
                     @csrf
-                    <input name="search" type="text" id="search-input-public" placeholder="  ابحث في الأسئلة والإجابات العامة ...">
+                    <input name="search" type="text" id="search-input-public"
+                        placeholder="  ابحث في الأسئلة والإجابات العامة ...">
                     <button type="submit" class="btn btn-search">بحث</button>
                 </div>
             </form>
-            <form action="{{ route('questions.visitorSearch') }}" method="GET" id="searchFormMine" class="mine-search hidden">
+            <form action="{{ route('questions.visitorSearch') }}" method="GET" id="searchFormMine"
+                class="mine-search hidden">
                 <div class="search-box">
                     @csrf
-                    <input name="search" type="text" id="search-input-mine" placeholder=" ابحث في الأسئلة والإجابات الخاصة ...">
+                    <input name="search" type="text" id="search-input-mine"
+                        placeholder=" ابحث في الأسئلة والإجابات الخاصة ...">
                     <button type="submit" class="btn btn-search">بحث</button>
                 </div>
             </form>
             <div class="d-flex gap-2 mb-3">
-                <button type="button" id="all" class="btn btn-light">عامَّة</button>
                 <button type="button" id="mine" class="btn btn-primary">خاصَّة</button>
+                <button type="button" id="all" class="btn btn-light">عامَّة</button>
             </div>
-            <div id="answers-container-public">
+            <div id="answers-container-public" class="hidden">
                 @if ($answeredQuestions->count() > 0)
-                    @foreach ($questions as $question)
-                        @if ($question['is_answered'] == true)
-                            <div class="answer-item">
-                                <div class="question-section">
-                                    <span class="question-label">السؤال:</span>
-                                    <div class="question-text">{{ $question['content'] }}</div>
-                                </div>
-                                <div class="answer-section">
-                                    <span class="answer-label">الإجابة:</span>
-                                    <div class="answer-text">{{ $question['answer'] }}</div>
-                                </div>
-                                <div class="answer-meta d-flex justify-content-between align-items-center">
-                                    @auth
-                                        @if (Auth::user()->privilege_level === 2)
-                                            <i class="fa-solid fa-trash icon-trash" data-bs-toggle="modal"
-                                                data-bs-target="#exampleModalDeleteUnanswer{{ $question['id'] }}"></i>
-                                        @endif
-                                    @endauth
-                                    <span class="answer-date">{{ $question['created_at'] }}</span>
-                                </div>
+                    @foreach ($answeredQuestions as $answeredQuestion)
+                        <div class="answer-item">
+                            <div class="question-section">
+                                <span class="question-label">السؤال:</span>
+                                <div class="question-text">{{ $answeredQuestion['content'] }}</div>
                             </div>
-                        @endif
+                            <div class="answer-section">
+                                <span class="answer-label">الإجابة:</span>
+                                <div class="answer-text">{{ $answeredQuestion['answer'] }}</div>
+                            </div>
+                            <div class="answer-meta d-flex justify-content-between align-items-center">
+                                @auth
+                                    @if (Auth::user()->privilege_level === 2)
+                                        <i class="fa-solid fa-trash icon-trash" data-bs-toggle="modal"
+                                            data-bs-target="#exampleModalDeleteUnanswer{{ $answeredQuestion['id'] }}"></i>
+                                    @endif
+                                @endauth
+                                <span class="answer-date">{{ $answeredQuestion['created_at']->format('Y-m-d \\\ H:i:s') }}</span>
+                            </div>
+                        </div>
                     @endforeach
                 @else
                     <div id="empty-state-public" class="empty-state">
@@ -132,37 +133,36 @@
                     </div>
                 @endif
             </div>
-            <div id="answers-container-mine" class="hidden">
+            <div id="answers-container-mine" class="">
                 <p style="font-size: 0.9rem; color: #6b6565;">ملحوظة : لن تتمكّن من الوصول لأسئلتك إذا استخدمت جهازًا أو
                     متصفحًا مختلفًا.</p>
 
                 @if ($answeredUserQuestions->count() > 0)
-                    @foreach ($userQuestions as $userQuestion)
-                        @if ($userQuestion['is_answered'] == true)
+                    @foreach ($answeredUserQuestions as $answeredUserQuestion)
                             <div class="answer-item">
                                 <div class="question-section">
                                     <span class="question-label">السؤال:</span>
-                                    <div class="question-text">{{ $userQuestion['content'] }}</div>
+                                    <div class="question-text">{{ $answeredUserQuestion['content'] }}</div>
                                 </div>
                                 <div class="answer-section">
                                     <span class="answer-label">الإجابة:</span>
-                                    <div class="answer-text">{{ $userQuestion['answer'] }}</div>
+                                    <div class="answer-text">{{ $answeredUserQuestion['answer'] }}</div>
                                 </div>
                                 <div class="answer-meta d-flex justify-content-between align-items-center">
                                     @auth
                                         @if (Auth::user()->privilege_level === 2)
                                             <i class="fa-solid fa-trash icon-trash" data-bs-toggle="modal"
-                                                data-bs-target="#exampleModalDeleteUnanswer{{ $userQuestion['id'] }}"></i>
+                                                data-bs-target="#exampleModalDeleteUnanswer{{ $answeredUserQuestion['id'] }}"></i>
                                         @endif
                                     @endauth
-                                    <span class="answer-date">{{ $userQuestion['created_at'] }}</span>
+                                    <span
+                                        class="answer-date">{{ $answeredUserQuestion['created_at']->format('Y-m-d \\\ H:i:s') }}</span>
                                 </div>
                             </div>
-                        @endif
                     @endforeach
                 @else
                     <div id="empty-state-mine" class="empty-state">
-                        <p>لا توجد إجابات خاصة بك منشورة حالياً</p>
+                        <p>لا توجد إجابات خاصة منشورة حالياً</p>
                         <p style="font-size: 0.9rem; color: #bbb;">سيتم عرض الإجابات الخاصة هنا بمجرد نشرها</p>
                     </div>
                 @endif

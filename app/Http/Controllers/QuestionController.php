@@ -15,14 +15,14 @@ class QuestionController extends Controller
     public function index(Request $request)
     {
         $questions = Question::oldest('created_at')->get();
-        $answeredQuestions = Question::where('is_answered', true)->orderBy('created_at', 'asc')->get();
+        $answeredQuestions = Question::where('is_answered', true)->orderBy('created_at', 'desc')->get();
         $unAnsweredQuestions = Question::where('is_answered', false)->orderBy('created_at', 'asc')->get();
 
         $visitorId = $request->cookie('visitor_id');
         $userQuestions = Question::where('visitor_id', $visitorId)->get();
         $answeredUserQuestions = Question::where('visitor_id', $visitorId)
             ->where('is_answered', true)
-            ->orderBy('created_at', 'asc')
+            ->orderBy('created_at', 'desc')
             ->get();
         return view('index', compact('questions', 'answeredQuestions', 'unAnsweredQuestions', 'userQuestions', 'answeredUserQuestions'));
     }
