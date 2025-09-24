@@ -12,14 +12,19 @@ class QuestionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $questions = Question::oldest('created_at')->get();
         $answeredQuestions = Question::where('is_answered', true)->orderBy('created_at', 'asc')->get();
         $unAnsweredQuestions = Question::where('is_answered', false)->orderBy('created_at', 'asc')->get();
 
-
-        return view('index', compact('questions', 'answeredQuestions','unAnsweredQuestions'));
+        $visitorId = $request->cookie('visitor_id');
+        $userQuestions = Question::where('visitor_id', $visitorId)->get();
+        $answeredUserQuestions = Question::where('visitor_id', $visitorId)
+            ->where('is_answered', true)
+            ->orderBy('created_at', 'asc')
+            ->get();
+        return view('index', compact('questions', 'answeredQuestions', 'unAnsweredQuestions', 'userQuestions', 'answeredUserQuestions'));
     }
 
     /**
@@ -38,8 +43,9 @@ class QuestionController extends Controller
         $fields = $request->validate([
             'content' => 'required|string|max:1000',
         ]);
+        $visitorId = $request->cookie('visitor_id');
 
-        Question::create($fields);
+        Question::create($fields + ['visitor_id' => $visitorId]);
 
         if ($request->expectsJson()) {
             return response()->json(['message' => 'تم إرسال السؤال بنجاح!']);
@@ -104,6 +110,47 @@ class QuestionController extends Controller
             'questions' => $questions,
             'user' => $user,
             'answeredQuestions' => $answeredQuestions
+        ]);
+    }
+
+
+    public function userQuestions(Request $request)
+    {
+        $visitorId = request()->cookie('visitor_id');
+
+        $visitorId = $request->cookie('visitor_id');
+        $questions = Question::where('visitor_id', $visitorId)->get();
+
+        return view('questions.my', compact('questions'));
+    }
+
+
+
+    public function visitorSearch(Request $request)
+    {
+        $search = $request->search;
+
+        $visitorId = $request->cookie('visitor_id');
+        $userQuestions = Question::where('visitor_id', $visitorId)
+            ->where(function ($query) use ($search) {
+                $query->where('content', 'LIKE', "%{$search}%")
+                    ->orWhere('answer', 'LIKE', "%{$search}%");
+            })
+            ->get();
+
+        $answeredUserQuestions = Question::where('visitor_id', $visitorId)
+            ->where('is_answered', true)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+
+
+        $user = Auth::user();
+
+        return response()->json([
+            'questions' => $userQuestions,
+            'user' => $user,
+            'answeredQuestions' => $answeredUserQuestions
         ]);
     }
 }

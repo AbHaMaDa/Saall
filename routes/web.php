@@ -42,3 +42,6 @@ Route::delete('questions/{question}', [QuestionController::class, 'destroy'])->n
 
 
 Route::get('/search', [QuestionController::class,'search'])->name('questions.search');
+
+Route::get('/search/visitor', [QuestionController::class,'visitorSearch'])->name('questions.visitorSearch');
+

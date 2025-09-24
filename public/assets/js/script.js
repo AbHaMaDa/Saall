@@ -18,7 +18,9 @@ window.showTab = function (event, tabName) {
     document.getElementById(`${tabName}-tab`).classList.add("active");
 
     // Add active class to clicked button أو للزر المناسب لو event مش موجود
-    const btn = event?.target || document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+    const btn =
+        event?.target ||
+        document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
     if (btn) btn.classList.add("active");
 
     // حفظ آخر تبويب تم اختياره
@@ -32,10 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const lastTab = localStorage.getItem("lastActiveTab") || currentTab;
     showTab(null, lastTab); // تمرير null كـ event
 });
-
-
-
-
 
 // Question Management
 document.addEventListener("DOMContentLoaded", function () {
@@ -121,13 +119,33 @@ function showMessage(text, type) {
 
     // 4. إظهار الرسالة الجديدة
     messageEl.classList.remove("hidden");
+    messageEl.classList.remove("fading");
 
     // 5. ضبط timeout لإخفاءها بعد 4 ثواني
     messageEl.timeoutId = setTimeout(() => {
-        messageEl.classList.add("hidden");
+        messageEl.classList.add("fading");
         messageEl.timeoutId = null;
     }, 4000);
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    const flashMsg = document.getElementById("flash-message");
+
+    if (flashMsg) {
+        if (flashMsg.timeoutId) {
+            clearTimeout(flashMsg.timeoutId);
+        }
+        // 4. إظهار الرسالة الجديدة
+        flashMsg.classList.remove("hidden");
+        flashMsg.classList.remove("fading");
+
+        // 5. ضبط timeout لإخفاءها بعد 4 ثواني
+        flashMsg.timeoutId = setTimeout(() => {
+            flashMsg.classList.add("fading");
+            flashMsg.timeoutId = null;
+        }, 4000);
+    }
+});
 
 document.addEventListener("DOMContentLoaded", function () {
     const toggle = document.getElementById("nav-toggle");
@@ -142,34 +160,43 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 });
 
-let token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+const token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
 
-document.getElementById("searchForm").addEventListener("submit", function (e) {
+// العام
+document.getElementById("searchFormPublic").addEventListener("submit", function (e) {
     e.preventDefault();
+    const query = document.getElementById("search-input-public").value;
+    fetchAnswers(`/search?search=${encodeURIComponent(query)}`, "answers-container-public");
+});
 
-    const query = document.getElementById("search-input").value;
+// الخاص
+document.getElementById("searchFormMine").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const query = document.getElementById("search-input-mine").value;
+    fetchAnswers(`/search/visitor?search=${encodeURIComponent(query)}`, "answers-container-mine");
+});
 
-    fetch(`/search?search=${encodeURIComponent(query)}`)
+// دالة عامة لعرض النتائج
+function fetchAnswers(url, containerId) {
+    fetch(url)
         .then(res => res.json())
         .then(data => {
-            const container = document.getElementById("answers-container");
+            const container = document.getElementById(containerId);
             container.innerHTML = "";
+
             const answeredQuestions = data.questions.filter(q => q.is_answered == 1);
             if (answeredQuestions.length === 0) {
                 container.innerHTML = "<p>لا توجد نتائج مطابقة.</p>";
                 return;
             }
 
-            const isAdmin = data.user?.privilege_level === 2; // <-- هنا
+            const isAdmin = data.user?.privilege_level === 2;
 
-            data.questions.forEach(q => {
-                if (q.is_answered != 1) return;
-
+            answeredQuestions.forEach(q => {
                 const trashIcon = isAdmin
                     ? `<i class="fa-solid fa-trash icon-trash" data-bs-toggle="modal" data-bs-target="#exampleModalDeleteUnanswer${q.id}"></i>`
                     : "";
-
-
+                const dateObj = new Date(q.created_at);
 
                 container.innerHTML += `
                     <div class="answer-item">
@@ -183,7 +210,7 @@ document.getElementById("searchForm").addEventListener("submit", function (e) {
                         </div>
                         <div class="answer-meta d-flex justify-content-between align-items-center">
                             ${trashIcon}
-                            <span class="answer-date">${q.created_at}</span>
+                            <span class="answer-date">${dateObj.toLocaleDateString()} ${dateObj.toLocaleTimeString()}</span>
                         </div>
                     </div>
                     ${isAdmin ? `
@@ -207,21 +234,62 @@ document.getElementById("searchForm").addEventListener("submit", function (e) {
                                 </div>
                             </div>
                         </div>
-                    </div>`:""}
+                    </div>` : ""}
                 `;
             });
         })
         .catch(err => console.error("Error:", err));
-});
+}
 
 
-    document.addEventListener("DOMContentLoaded", () => {
-        const flashMsg = document.getElementById("flash-message");
-        if (flashMsg) {
-            setTimeout(() => {
-                flashMsg.classList.add("hide");
-                // بعد ما يخلص الانتقال نشيله من الـ DOM
-                setTimeout(() => flashMsg.remove(), 500);
-            }, 4000); // بعد ٤ ثواني يبدأ يختفي
+
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const allBtn = document.getElementById("all");
+    const mineBtn = document.getElementById("mine");
+    const publicSearch = document.querySelector(".public-search");
+    const mineSearch = document.querySelector(".mine-search");
+
+
+    allBtn.addEventListener("click", () => toggleAnswers("all"));
+    mineBtn.addEventListener("click", () => toggleAnswers("mine"));
+
+    function toggleAnswers(type) {
+        const publicContainer = document.getElementById(
+            "answers-container-public"
+        );
+        const mineContainer = document.getElementById("answers-container-mine");
+
+        // Default hide/show
+        if (type === "all") {
+            publicContainer.classList.remove("hidden");
+            mineContainer.classList.add("hidden");
+            publicSearch.classList.remove("hidden");
+            mineSearch.classList.add("hidden");
+
+            // تحديث الأزرار
+            allBtn.classList.add("btn-light");
+            allBtn.classList.remove("btn-primary");
+            mineBtn.classList.add("btn-primary");
+            mineBtn.classList.remove("btn-light");
+        } else {
+            publicContainer.classList.add("hidden");
+            mineContainer.classList.remove("hidden");
+            publicSearch.classList.add("hidden");
+            mineSearch.classList.remove("hidden");
+
+            // تحديث الأزرار
+            mineBtn.classList.add("btn-light");
+            mineBtn.classList.remove("btn-primary");
+            allBtn.classList.add("btn-primary");
+            allBtn.classList.remove("btn-light");
         }
-    });
+    }
+
+    // تفعيل التبويب الافتراضي عند تحميل الصفحة
+    toggleAnswers("all");
+});

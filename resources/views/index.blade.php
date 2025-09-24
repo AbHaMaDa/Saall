@@ -48,7 +48,7 @@
 
         <!-- Navigation Tabs -->
         <nav class="nav-tabs">
-            <button class="tab-btn active" data-tab="ask" onclick="showTab(event, 'ask')">إرسال سؤال</button>
+            <button class="tab-btn " data-tab="ask" onclick="showTab(event, 'ask')">إرسال سؤال</button>
             <button class="tab-btn" data-tab="answers" onclick="showTab(event, 'answers')">الإجابات</button>
             @auth
                 @if (Auth::user()->privilege_level === 2)
@@ -58,7 +58,7 @@
         </nav>
 
         <!-- Ask Question Tab -->
-        <div id="ask-tab" class="tab-content active">
+        <div id="ask-tab" class="tab-content ">
             <div class="card">
                 <h2>اطرح سؤالك</h2>
                 <form action="{{ route('questions.store') }}" id="question-form" method="POST">
@@ -82,14 +82,25 @@
 
         <!-- Answers Tab -->
         <div id="answers-tab" class="tab-content">
-            <form action="{{ route('questions.search') }}" method="GET" id="searchForm">
+            <form action="{{ route('questions.search') }}" method="GET" id="searchFormPublic" class="public-search">
                 <div class="search-box">
                     @csrf
-                    <input name="search" type="text" id="search-input" placeholder="ابحث في الأسئلة والإجابات...">
+                    <input name="search" type="text" id="search-input-public" placeholder="  ابحث في الأسئلة والإجابات العامة ...">
                     <button type="submit" class="btn btn-search">بحث</button>
                 </div>
             </form>
-            <div id="answers-container">
+            <form action="{{ route('questions.visitorSearch') }}" method="GET" id="searchFormMine" class="mine-search hidden">
+                <div class="search-box">
+                    @csrf
+                    <input name="search" type="text" id="search-input-mine" placeholder=" ابحث في الأسئلة والإجابات الخاصة ...">
+                    <button type="submit" class="btn btn-search">بحث</button>
+                </div>
+            </form>
+            <div class="d-flex gap-2 mb-3">
+                <button type="button" id="all" class="btn btn-light">عامَّة</button>
+                <button type="button" id="mine" class="btn btn-primary">خاصَّة</button>
+            </div>
+            <div id="answers-container-public">
                 @if ($answeredQuestions->count() > 0)
                     @foreach ($questions as $question)
                         @if ($question['is_answered'] == true)
@@ -115,9 +126,44 @@
                         @endif
                     @endforeach
                 @else
-                    <div class="empty-state">
+                    <div id="empty-state-public" class="empty-state">
                         <p>لا توجد إجابات منشورة حالياً</p>
                         <p style="font-size: 0.9rem; color: #bbb;">سيتم عرض الإجابات هنا بمجرد نشرها</p>
+                    </div>
+                @endif
+            </div>
+            <div id="answers-container-mine" class="hidden">
+                <p style="font-size: 0.9rem; color: #6b6565;">ملحوظة : لن تتمكّن من الوصول لأسئلتك إذا استخدمت جهازًا أو
+                    متصفحًا مختلفًا.</p>
+
+                @if ($answeredUserQuestions->count() > 0)
+                    @foreach ($userQuestions as $userQuestion)
+                        @if ($userQuestion['is_answered'] == true)
+                            <div class="answer-item">
+                                <div class="question-section">
+                                    <span class="question-label">السؤال:</span>
+                                    <div class="question-text">{{ $userQuestion['content'] }}</div>
+                                </div>
+                                <div class="answer-section">
+                                    <span class="answer-label">الإجابة:</span>
+                                    <div class="answer-text">{{ $userQuestion['answer'] }}</div>
+                                </div>
+                                <div class="answer-meta d-flex justify-content-between align-items-center">
+                                    @auth
+                                        @if (Auth::user()->privilege_level === 2)
+                                            <i class="fa-solid fa-trash icon-trash" data-bs-toggle="modal"
+                                                data-bs-target="#exampleModalDeleteUnanswer{{ $userQuestion['id'] }}"></i>
+                                        @endif
+                                    @endauth
+                                    <span class="answer-date">{{ $userQuestion['created_at'] }}</span>
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
+                @else
+                    <div id="empty-state-mine" class="empty-state">
+                        <p>لا توجد إجابات خاصة بك منشورة حالياً</p>
+                        <p style="font-size: 0.9rem; color: #bbb;">سيتم عرض الإجابات الخاصة هنا بمجرد نشرها</p>
                     </div>
                 @endif
             </div>
@@ -200,12 +246,12 @@
         <span class="message-text"></span>
     </div>
 
-        <!-- pending Message -->
-@if(session('status'))
-    <div id="flash-message" class="message pending">
-        <span class="message-text">{{ session('status') }}</span>
-    </div>
-@endif
+    <!-- pending Message -->
+    @if (session('status'))
+        <div id="flash-message" class="message pending">
+            <span class="message-text">{{ session('status') }}</span>
+        </div>
+    @endif
 
     <!-- Modal logout -->
     <div class="modal fade" id="exampleModallogout" tabindex="-1" aria-labelledby="exampleModalLabellogout"

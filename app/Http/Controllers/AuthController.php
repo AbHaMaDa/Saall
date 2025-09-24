@@ -35,22 +35,24 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|string|email|max:255|exists:users,email',
+        $credentials=$request->validate([
+            'email' => 'required|string|email|max:255',
             'password' => 'required|string|min:8',
         ]);
 
 
-        $user = User::where("email", $request->email)->first();
+        // محاولة تسجيل الدخول
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            // 🔒 إعادة إنشاء السيشن بعد تسجيل الدخول
+            $request->session()->regenerate();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-
-            return back()->withErrors(['password' => 'incorrect password'])->withInput();
+            return redirect()->intended('/index')->with('success', 'تم تسجيل الدخول بنجاح.');
         }
 
-        Auth::login($user);
-
-        return redirect('/index')->with('success', 'Login successful.');
+        // لو كلمة المرور غلط
+        return back()->withErrors([
+            'email' => 'بيانات الدخول غير صحيحة.',
+        ])->onlyInput('email');
     }
 
 

@@ -9,6 +9,7 @@ class Question extends Model
     protected $fillable = [
         'content',
         'answer',
-        'is_answered'
+        'is_answered',
+        'visitor_id',
     ];
 }

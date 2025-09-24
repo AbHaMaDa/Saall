@@ -16,6 +16,7 @@ return new class extends Migration
             $table->text('content');
             $table->text('answer')->nullable();
             $table->boolean('is_answered')->default(false);
+            $table->uuid('visitor_id')->nullable()->index();
             $table->timestamps();
         });
     }
