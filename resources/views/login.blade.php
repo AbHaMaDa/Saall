@@ -29,7 +29,7 @@
             </div>
 
             <button type="submit" class="btn btn-signing">تسجيل</button>
-            <p class="form-text mt-3"><a href="/register">طلب الإنضمام للادارة ! </a></p>
+            <p class="form-text mt-3"><a href="/register">طلب الإنضمام للإدارة ! </a></p>
             <p class="form-text mt-3"><a href="/index">الصفحة الرئيسية</a></p>
         </form>
     </div>

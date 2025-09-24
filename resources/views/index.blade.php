@@ -86,7 +86,7 @@
                 <div class="search-box">
                     @csrf
                     <input name="search" type="text" id="search-input-public"
-                        placeholder="  ابحث في الأسئلة والإجابات العامة ...">
+                        placeholder="ابحث في الأسئلة والإجابات العامة...">
                     <button type="submit" class="btn btn-search">بحث</button>
                 </div>
             </form>
@@ -95,7 +95,7 @@
                 <div class="search-box">
                     @csrf
                     <input name="search" type="text" id="search-input-mine"
-                        placeholder=" ابحث في الأسئلة والإجابات الخاصة ...">
+                        placeholder="ابحث في الأسئلة والإجابات الخاصة...">
                     <button type="submit" class="btn btn-search">بحث</button>
                 </div>
             </form>
@@ -190,8 +190,7 @@
                                                     <div class="admin-question-info">
                                                         <div class="admin-question-text">{{ $question['content'] }}</div>
                                                         <div class="admin-question-meta">
-                                                            {{ $question['created_at'] }}
-                                                            | <strong>لم يتم الرد</strong>
+                                                            {{ $question['created_at']->format('Y-m-d \\\ H:i:s') }}
                                                         </div>
                                                     </div>
                                                 </div>
