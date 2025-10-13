@@ -2,6 +2,7 @@
 
 @section('content')
 
+
     <nav class="app-navbar navbar navbar-expand-lg ">
         <div class="container ">
             <!-- Brand / Logo -->
@@ -85,7 +86,7 @@
             <form action="{{ route('questions.search') }}" method="GET" id="searchFormPublic" class="public-search">
                 <div class="search-box">
                     @csrf
-                    <input name="search" type="text" id="search-input-public"
+                    <input class="search-input" name="search" type="text" id="search-input-public"
                         placeholder="ابحث في الأسئلة والإجابات العامة...">
                     <button type="submit" class="btn btn-search">بحث</button>
                 </div>
@@ -94,7 +95,7 @@
                 class="mine-search hidden">
                 <div class="search-box">
                     @csrf
-                    <input name="search" type="text" id="search-input-mine"
+                    <input class="search-input" name="search" type="text" id="search-input-mine"
                         placeholder="ابحث في الأسئلة والإجابات الخاصة...">
                     <button type="submit" class="btn btn-search">بحث</button>
                 </div>

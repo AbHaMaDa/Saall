@@ -6,7 +6,7 @@
 
 @section('content')
     <div class="signing-container">
-        <h2> دخول الادارة </h2>
+        <h2> دخول الإدارة </h2>
         <p class="text-center" style="font-size: 0.9rem; color: #bbb;">الإدارة خاصة بالشيخ و المسؤلين فقط .</p>
         <form action="{{ route('Auth.login') }}" method="POST">
             @csrf
@@ -26,6 +26,8 @@
                 @error('password')
                     <div class="text-danger">{{ $message }}</div>
                 @enderror
+                <p class="form-text"><a href="{{route('password.request')}}">نسيت كلمة المرور ؟</a></p>
+
             </div>
 
             <button type="submit" class="btn btn-signing">تسجيل</button>
