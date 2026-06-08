@@ -1,8 +1,7 @@
 {
     "version": 2,
     "framework": null,
-    "installCommand": "npm ci",
-    "buildCommand": "npm run build && ln -sfn public dist",
+    "buildCommand": "npm install && npm run build && ln -sfn public dist",
     "outputDirectory": "dist",
     "functions": {
         "api/index.php": {
