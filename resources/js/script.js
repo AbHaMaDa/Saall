@@ -323,8 +323,23 @@ document.addEventListener("DOMContentLoaded", function () {
 // Turns the clicked submit button (or fallback first submit) into a spinner
 // for any form on the page — sending a question, deleting, promoting, demoting,
 // login, register, password reset, etc. No per-form wiring needed.
+//
+// For real navigating forms the spinner disappears when the new page loads.
+// For AJAX forms (the question form and the two search forms call
+// preventDefault + fetch) the spinner is cleared as soon as that fetch
+// resolves, or after a short tick if the handler returned early
+// (e.g. client-side validation failed).
 (function () {
     let lastClickedSubmitter = null;
+    let pendingAjaxSubmitter = null;
+    let pendingAjaxClearTimer = null;
+
+    const clearLoading = (el) => {
+        if (!el) return;
+        el.classList.remove("is-loading");
+        el.removeAttribute("aria-busy");
+        if ("disabled" in el) el.disabled = false;
+    };
 
     document.addEventListener("click", (e) => {
         const btn = e.target.closest(
@@ -353,22 +368,49 @@ document.addEventListener("DOMContentLoaded", function () {
         submitter.setAttribute("aria-busy", "true");
         submitter.disabled = true;
 
-        // Safety net: re-enable after 15s in case the request stalls
-        // and the page never navigates.
-        setTimeout(() => {
-            submitter.classList.remove("is-loading");
-            submitter.removeAttribute("aria-busy");
-            submitter.disabled = false;
-        }, 15000);
+        // After all submit listeners have run, decide how to clean up:
+        // navigating form → leave it; the new page replaces the DOM.
+        // AJAX form → either fetch will clear it via the wrapper below,
+        //             or no fetch happens (early return) and a short
+        //             timer clears it.
+        pendingAjaxSubmitter = submitter;
+        queueMicrotask(() => {
+            if (!e.defaultPrevented) {
+                pendingAjaxSubmitter = null;
+                return;
+            }
+            clearTimeout(pendingAjaxClearTimer);
+            pendingAjaxClearTimer = setTimeout(() => {
+                if (pendingAjaxSubmitter === submitter) {
+                    clearLoading(submitter);
+                    pendingAjaxSubmitter = null;
+                }
+            }, 80);
+        });
+
+        // Safety net for a navigating form that never navigates (network
+        // dropped, server hung). 15s feels long but is shorter than the
+        // browser's own timeout.
+        setTimeout(() => clearLoading(submitter), 15000);
     }, true);
+
+    // Wrap fetch so AJAX forms clear their submitter when the request
+    // resolves. We only attach if a fetch starts shortly after a submit.
+    if (typeof window.fetch === "function") {
+        const origFetch = window.fetch.bind(window);
+        window.fetch = function (...args) {
+            const sub = pendingAjaxSubmitter;
+            pendingAjaxSubmitter = null;
+            clearTimeout(pendingAjaxClearTimer);
+            const p = origFetch(...args);
+            if (sub) p.finally(() => clearLoading(sub));
+            return p;
+        };
+    }
 
     // Back/forward cache restores DOM with disabled buttons — clear it.
     window.addEventListener("pageshow", (e) => {
         if (!e.persisted) return;
-        document.querySelectorAll(".is-loading").forEach((el) => {
-            el.classList.remove("is-loading");
-            el.removeAttribute("aria-busy");
-            if ("disabled" in el) el.disabled = false;
-        });
+        document.querySelectorAll(".is-loading").forEach(clearLoading);
     });
 })();
