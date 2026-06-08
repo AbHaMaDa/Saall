@@ -30,14 +30,14 @@ Route::post(
 Route::get(
     '/reset-password/{token}',
     [ResetPassword::class, 'passwordReset']
-)->middleware('guest')->name('password.reset');
+)->name('password.reset');
 
 
 
 Route::post(
     '/reset-password',
     [ResetPassword::class, 'passwordUpdate']
-)->middleware('guest')->name('password.update');
+)->name('password.update');
 
 
 
