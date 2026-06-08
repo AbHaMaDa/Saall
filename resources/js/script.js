@@ -194,22 +194,19 @@ if (searchFormMine) {
     });
 }
 
-// تنسيق التاريخ والوقت بالعربية: YYYY-MM-DD H:MM ص/م بأرقام عربية
+// Date/time format: YYYY-MM-DD H:MM AM/PM with a wide gap between date and time.
 function formatArabicDateTime(date) {
     const pad = (n) => String(n).padStart(2, "0");
-    const toArabic = (s) => s.replace(/[0-9]/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
     const y = date.getFullYear();
     const mo = pad(date.getMonth() + 1);
     const d = pad(date.getDate());
     const h = date.getHours();
     const m = pad(date.getMinutes());
-    const suffix = h < 12 ? "ص" : "م";
+    const suffix = h < 12 ? "AM" : "PM";
     const h12 = h % 12 === 0 ? 12 : h % 12;
-    const arabicDate = toArabic(`${y}-${mo}-${d}`);
-    const arabicTime = toArabic(`${h12}:${m}`);
     // Three non-breaking spaces between date and time so HTML keeps them all.
     const gap = "   ";
-    return `${arabicDate}${gap}${arabicTime} ${suffix}`;
+    return `${y}-${mo}-${d}${gap}${h12}:${m} ${suffix}`;
 }
 
 // دالة عامة لعرض النتائج
