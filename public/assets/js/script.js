@@ -32,7 +32,9 @@ window.showTab = function (event, tabName) {
 // عند تحميل الصفحة
 document.addEventListener("DOMContentLoaded", () => {
     const lastTab = localStorage.getItem("lastActiveTab") || currentTab;
-    showTab(null, lastTab); // تمرير null كـ event
+    if (document.getElementById(`${lastTab}-tab`)) {
+        showTab(null, lastTab); // تمرير null كـ event
+    }
 });
 
 // Question Management
@@ -40,6 +42,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("question-form");
     const questionInput = document.getElementById("question");
     const charCount = document.getElementById("char-count");
+
+    if (!form || !questionInput || !charCount) return;
 
     // Live character count
     questionInput.addEventListener("input", () => {
@@ -160,14 +164,14 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 });
 
-const token = document
-    .querySelector('meta[name="csrf-token"]')
-    .getAttribute("content");
+const token =
+    document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ||
+    "";
 
 // العام
-document
-    .getElementById("searchFormPublic")
-    .addEventListener("submit", function (e) {
+const searchFormPublic = document.getElementById("searchFormPublic");
+if (searchFormPublic) {
+    searchFormPublic.addEventListener("submit", function (e) {
         e.preventDefault();
         const query = document.getElementById("search-input-public").value;
         fetchAnswers(
@@ -175,11 +179,12 @@ document
             "answers-container-public"
         );
     });
+}
 
 // الخاص
-document
-    .getElementById("searchFormMine")
-    .addEventListener("submit", function (e) {
+const searchFormMine = document.getElementById("searchFormMine");
+if (searchFormMine) {
+    searchFormMine.addEventListener("submit", function (e) {
         e.preventDefault();
         const query = document.getElementById("search-input-mine").value;
         fetchAnswers(
@@ -187,6 +192,7 @@ document
             "answers-container-mine"
         );
     });
+}
 
 // دالة عامة لعرض النتائج
 function fetchAnswers(url, containerId) {
@@ -264,6 +270,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const mineBtn = document.getElementById("mine");
     const publicSearch = document.querySelector(".public-search");
     const mineSearch = document.querySelector(".mine-search");
+
+    if (!allBtn || !mineBtn || !publicSearch || !mineSearch) return;
 
     allBtn.addEventListener("click", () => {
         toggleAnswers("all");
