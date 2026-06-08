@@ -30,7 +30,17 @@ class Visitor
             );
         }
 
-        return $next($request);
+        $response = $next($request);
+
+        // Force the browser to always revalidate HTML pages. This prevents a
+        // stale HTML cache from serving an old script.js?v=... reference even
+        // after a new deployment.
+        $contentType = $response->headers->get('Content-Type', '');
+        if (str_contains($contentType, 'text/html')) {
+            $response->headers->set('Cache-Control', 'no-store, must-revalidate, max-age=0');
+        }
+
+        return $response;
     }
 }
 

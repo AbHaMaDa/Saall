@@ -320,19 +320,24 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // ===== Global loading state on form submit =====
-// Turns the clicked submit button (or fallback first submit) into a spinner
-// for any form on the page — sending a question, deleting, promoting, demoting,
-// login, register, password reset, etc. No per-form wiring needed.
+// Turns the clicked submit button (or fallback first submit) into a spinner.
 //
-// For real navigating forms the spinner disappears when the new page loads.
-// For AJAX forms (the question form and the two search forms call
-// preventDefault + fetch) the spinner is cleared as soon as that fetch
-// resolves, or after a short tick if the handler returned early
-// (e.g. client-side validation failed).
+// Forms that navigate (login, logout, register, password reset, delete,
+// promote, demote, answer save) keep the spinner until the new page
+// replaces the DOM. Forms in AJAX_FORMS use preventDefault + fetch and
+// would never reload, so the spinner is explicitly cleared as soon as
+// the fetch resolves — or right away if no fetch happened (validation
+// failed). Hardcoding the AJAX form list is reliable; the previous
+// `e.defaultPrevented` heuristic could race depending on listener order.
+console.log("[saall] script revision 2 loaded");
 (function () {
+    const AJAX_FORM_IDS = new Set([
+        "question-form",
+        "searchFormPublic",
+        "searchFormMine",
+    ]);
     let lastClickedSubmitter = null;
-    let pendingAjaxSubmitter = null;
-    let pendingAjaxClearTimer = null;
+    let pendingFetchSubmitter = null;
 
     const clearLoading = (el) => {
         if (!el) return;
@@ -368,40 +373,33 @@ document.addEventListener("DOMContentLoaded", function () {
         submitter.setAttribute("aria-busy", "true");
         submitter.disabled = true;
 
-        // After all submit listeners have run, decide how to clean up:
-        // navigating form → leave it; the new page replaces the DOM.
-        // AJAX form → either fetch will clear it via the wrapper below,
-        //             or no fetch happens (early return) and a short
-        //             timer clears it.
-        pendingAjaxSubmitter = submitter;
-        queueMicrotask(() => {
-            if (!e.defaultPrevented) {
-                pendingAjaxSubmitter = null;
-                return;
-            }
-            clearTimeout(pendingAjaxClearTimer);
-            pendingAjaxClearTimer = setTimeout(() => {
-                if (pendingAjaxSubmitter === submitter) {
+        if (AJAX_FORM_IDS.has(form.id)) {
+            // AJAX form. The form's own handler will call fetch synchronously
+            // (success path) or return early (validation path).
+            pendingFetchSubmitter = submitter;
+            setTimeout(() => {
+                // If a fetch was kicked off, the wrapper below cleared
+                // pendingFetchSubmitter and will clear the spinner when
+                // the response arrives. If we're still pending here, the
+                // form returned without firing a request — clear now.
+                if (pendingFetchSubmitter === submitter) {
                     clearLoading(submitter);
-                    pendingAjaxSubmitter = null;
+                    pendingFetchSubmitter = null;
                 }
-            }, 80);
-        });
+            }, 120);
+        }
 
-        // Safety net for a navigating form that never navigates (network
-        // dropped, server hung). 15s feels long but is shorter than the
-        // browser's own timeout.
+        // Safety net for any form (navigating or AJAX) that never finishes.
         setTimeout(() => clearLoading(submitter), 15000);
     }, true);
 
-    // Wrap fetch so AJAX forms clear their submitter when the request
-    // resolves. We only attach if a fetch starts shortly after a submit.
+    // Wrap fetch so AJAX form submissions clear their submitter when the
+    // request resolves. Only acts when a submit happened just before.
     if (typeof window.fetch === "function") {
         const origFetch = window.fetch.bind(window);
         window.fetch = function (...args) {
-            const sub = pendingAjaxSubmitter;
-            pendingAjaxSubmitter = null;
-            clearTimeout(pendingAjaxClearTimer);
+            const sub = pendingFetchSubmitter;
+            pendingFetchSubmitter = null;
             const p = origFetch(...args);
             if (sub) p.finally(() => clearLoading(sub));
             return p;
