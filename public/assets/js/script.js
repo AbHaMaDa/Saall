@@ -345,7 +345,6 @@ document.addEventListener("DOMContentLoaded", function () {
 // the fetch resolves — or right away if no fetch happened (validation
 // failed). Hardcoding the AJAX form list is reliable; the previous
 // `e.defaultPrevented` heuristic could race depending on listener order.
-console.log("[saall] script revision 2 loaded");
 (function () {
     const AJAX_FORM_IDS = new Set([
         "question-form",
