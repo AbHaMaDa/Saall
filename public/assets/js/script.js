@@ -210,7 +210,7 @@ function fetchAnswers(url, containerId) {
                 return;
             }
 
-            const isAdmin = data.user?.privilege_level === 2;
+            const isAdmin = data.user?.privilege_level >= 2;
 
             answeredQuestions.forEach((q) => {
                 const trashIcon = isAdmin

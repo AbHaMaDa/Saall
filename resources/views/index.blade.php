@@ -52,7 +52,7 @@
             <button class="tab-btn " data-tab="ask" onclick="showTab(event, 'ask')">إرسال سؤال</button>
             <button class="tab-btn" data-tab="answers" onclick="showTab(event, 'answers')">الإجابات</button>
             @auth
-                @if (Auth::user()->privilege_level === 2)
+                @if (Auth::user()->privilege_level >= 2)
                     <button class="tab-btn" data-tab="admin" onclick="showTab(event, 'admin')">الإدارة</button>
                 @endif
             @endauth
@@ -118,7 +118,7 @@
                             </div>
                             <div class="answer-meta d-flex justify-content-between align-items-center">
                                 @auth
-                                    @if (Auth::user()->privilege_level === 2)
+                                    @if (Auth::user()->privilege_level >= 2)
                                         <i class="fa-solid fa-trash icon-trash" data-bs-toggle="modal"
                                             data-bs-target="#exampleModalDeleteUnanswer{{ $answeredQuestion['id'] }}"></i>
                                     @endif
@@ -151,7 +151,7 @@
                                 </div>
                                 <div class="answer-meta d-flex justify-content-between align-items-center">
                                     @auth
-                                        @if (Auth::user()->privilege_level === 2)
+                                        @if (Auth::user()->privilege_level >= 2)
                                             <i class="fa-solid fa-trash icon-trash" data-bs-toggle="modal"
                                                 data-bs-target="#exampleModalDeleteUnanswer{{ $answeredUserQuestion['id'] }}"></i>
                                         @endif
@@ -173,7 +173,7 @@
         <!-- Admin Tab -->
         @auth
 
-            @if (Auth::user()->privilege_level === 2)
+            @if (Auth::user()->privilege_level >= 2)
                 <div id="admin-tab" class="tab-content">
                     <div class="card">
 
