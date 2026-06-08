@@ -349,7 +349,7 @@
                                                                     <span>ترقية إلى مشرف</span>
                                                                 </button>
                                                             </form>
-                                                        @elseif ($level === 2 && Auth::user()->privilege_level === 3)
+                                                        @elseif ($level === 2)
                                                             <form action="{{ route('users.demote', $u->id) }}"
                                                                 method="POST" class="user-action-form">
                                                                 @csrf

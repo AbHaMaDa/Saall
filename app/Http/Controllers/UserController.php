@@ -26,10 +26,14 @@ class UserController extends Controller
     public function demote(User $user)
     {
         $actor = Auth::user();
-        abort_unless($actor && (int) $actor->privilege_level === 3, 403);
+        abort_unless($actor && in_array((int) $actor->privilege_level, [2, 3], true), 403);
 
         if ((int) $user->privilege_level === 3) {
             return redirect()->back()->with('status', 'لا يمكن تعديل صلاحيات المالك.');
+        }
+
+        if ($actor->id === $user->id) {
+            return redirect()->back()->with('status', 'لا يمكنك إنزال نفسك.');
         }
 
         $user->privilege_level = 1;
