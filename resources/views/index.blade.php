@@ -178,12 +178,12 @@
                     <div class="card">
 
                         <div id="admin-panel" class="admin-panel ">
-                            <div class="admin-header d-flex justify-content-between align-items-center">
+                            <div class="admin-header">
                                 <h2>إدارة الأسئلة</h2>
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                <button type="button" class="btn btn-manage-users" data-bs-toggle="modal"
                                     data-bs-target="#usersManagementModal">
-                                    <i class="fa-solid fa-users"></i>
-                                    إدارة المستخدمين
+                                    <i class="fa-solid fa-users-gear"></i>
+                                    <span>إدارة المستخدمين</span>
                                 </button>
                             </div>
                             @if ($unAnsweredQuestions->count() > 0)
@@ -282,18 +282,22 @@
     <!-- Users Management Modal -->
     @auth
         @if (Auth::user()->privilege_level === 2 || Auth::user()->privilege_level === 3)
-            <div class="modal fade" id="usersManagementModal" tabindex="-1" aria-labelledby="usersManagementModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal fade users-management-modal" id="usersManagementModal" tabindex="-1"
+                aria-labelledby="usersManagementModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            <h1 class="modal-title fs-5" id="usersManagementModalLabel">قائمة المستخدمين</h1>
+                            <h1 class="modal-title fs-5" id="usersManagementModalLabel">
+                                <i class="fa-solid fa-users-gear"></i>
+                                قائمة المستخدمين
+                                <span class="users-count">{{ $users->count() }}</span>
+                            </h1>
                         </div>
                         <div class="modal-body">
                             @if ($users->count() > 0)
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle text-center">
+                                <div class="users-table-wrapper">
+                                    <table class="users-table">
                                         <thead>
                                             <tr>
                                                 <th>الاسم</th>
@@ -308,43 +312,52 @@
                                                     $level = (int) $u->privilege_level;
                                                     $isSelf = Auth::id() === $u->id;
                                                 @endphp
-                                                <tr>
-                                                    <td>{{ $u->name }}</td>
-                                                    <td>{{ $u->email }}</td>
-                                                    <td>
+                                                <tr class="user-row level-{{ $level }}">
+                                                    <td data-label="الاسم">
+                                                        <span class="user-avatar">{{ mb_substr($u->name, 0, 1) }}</span>
+                                                        <span class="user-name">{{ $u->name }}</span>
+                                                    </td>
+                                                    <td data-label="البريد" class="user-email">{{ $u->email }}</td>
+                                                    <td data-label="الصلاحية">
                                                         @if ($level === 3)
-                                                            <span class="badge bg-warning text-dark">مالك</span>
+                                                            <span class="role-badge role-owner">
+                                                                <i class="fa-solid fa-crown"></i> مالك
+                                                            </span>
                                                         @elseif ($level === 2)
-                                                            <span class="badge bg-success">مشرف</span>
+                                                            <span class="role-badge role-admin">
+                                                                <i class="fa-solid fa-shield-halved"></i> مشرف
+                                                            </span>
                                                         @else
-                                                            <span class="badge bg-secondary">مستخدم</span>
+                                                            <span class="role-badge role-user">
+                                                                <i class="fa-solid fa-user"></i> مستخدم
+                                                            </span>
                                                         @endif
                                                     </td>
-                                                    <td>
+                                                    <td data-label="إجراء">
                                                         @if ($level === 3 || $isSelf)
-                                                            <span class="text-muted">—</span>
+                                                            <span class="action-none">—</span>
                                                         @elseif ($level === 1)
                                                             <form action="{{ route('users.promote', $u->id) }}"
-                                                                method="POST" class="d-inline">
+                                                                method="POST" class="user-action-form">
                                                                 @csrf
                                                                 @method('PATCH')
-                                                                <button type="submit" class="btn btn-sm btn-success">
+                                                                <button type="submit" class="btn-promote">
                                                                     <i class="fa-solid fa-arrow-up"></i>
-                                                                    ترقية إلى مشرف
+                                                                    <span>ترقية إلى مشرف</span>
                                                                 </button>
                                                             </form>
                                                         @elseif ($level === 2 && Auth::user()->privilege_level === 3)
                                                             <form action="{{ route('users.demote', $u->id) }}"
-                                                                method="POST" class="d-inline">
+                                                                method="POST" class="user-action-form">
                                                                 @csrf
                                                                 @method('PATCH')
-                                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                <button type="submit" class="btn-demote">
                                                                     <i class="fa-solid fa-arrow-down"></i>
-                                                                    إنزال إلى مستخدم
+                                                                    <span>إنزال إلى مستخدم</span>
                                                                 </button>
                                                             </form>
                                                         @else
-                                                            <span class="text-muted">—</span>
+                                                            <span class="action-none">—</span>
                                                         @endif
                                                     </td>
                                                 </tr>
