@@ -174,7 +174,8 @@
         @auth
 
             @if (Auth::user()->privilege_level >= 2)
-                <div id="admin-tab" class="tab-content">
+
+            <div id="admin-tab" class="tab-content">
                     <div class="card">
 
                         <div id="admin-panel" class="admin-panel ">
@@ -272,7 +273,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <form action="{{ route('Auth.logout') }}" method="POST" class="d-inline">
+                    <form action="{{ route('Auth.logout') }}" method="POST">
                         @csrf
                         <button type="submit" class="btn btn-primary">تسجيل الخروج</button>
                     </form>

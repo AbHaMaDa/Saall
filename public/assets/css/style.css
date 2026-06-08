@@ -1196,6 +1196,14 @@ a.btn-secondary.is-loading::after {
     to { transform: rotate(360deg); }
 }
 
+/* Forms wrapping a single button inside .modal-footer should not break
+   the flex alignment that Bootstrap sets up between sibling buttons.
+   `display: contents` keeps the form functional but hands its child
+   button straight to the flex parent. */
+.modal-footer > form {
+    display: contents;
+}
+
 /* Inline icon spinner — used to swap a fa-trash etc. into a spinner */
 .icon-spinner {
     display: inline-block;
