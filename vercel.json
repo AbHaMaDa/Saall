@@ -1,0 +1,30 @@
+{
+    "version": 2,
+    "framework": null,
+    "installCommand": "composer install --no-dev --optimize-autoloader --no-interaction && npm ci",
+    "buildCommand": "npm run build",
+    "functions": {
+        "api/index.php": {
+            "runtime": "vercel-php@0.7.3"
+        }
+    },
+    "routes": [
+        {
+            "src": "/(favicon\\.ico|robots\\.txt|icon\\.png|icon2\\.png|join\\.jpeg|logo\\.jpeg|logout\\.jpeg|trash\\.jpg)",
+            "dest": "/public/$1"
+        },
+        {
+            "src": "/(assets|build|storage)/(.*)",
+            "dest": "/public/$1/$2"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/api/index.php"
+        }
+    ],
+    "env": {
+        "APP_STORAGE_PATH": "/tmp/storage",
+        "VIEW_COMPILED_PATH": "/tmp/storage/framework/views",
+        "LOG_CHANNEL": "stderr"
+    }
+}
