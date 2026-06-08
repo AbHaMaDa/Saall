@@ -7,14 +7,6 @@ use App\Http\Controllers\ResetPassword;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
-
-Route::get('/index', function () {
-    return view('index');
-});
 
 
 Route::get('/register', function () {
@@ -57,6 +49,7 @@ Route::post('Auth/login', [AuthController::class, 'login'])->name('Auth.login')-
 Route::get('Auth/logout', [AuthController::class, 'logout'])->name('Auth.logout');
 
 
+Route::get('/', [QuestionController::class, 'index'])->name('home');
 Route::get('/index', [QuestionController::class, 'index'])->name('questions.index');
 
 Route::post('questions/store', [QuestionController::class, 'store'])->name('questions.store');
