@@ -52,7 +52,7 @@ Route::get('Auth/logout', [AuthController::class, 'logout'])->name('Auth.logout'
 Route::get('/', [QuestionController::class, 'index'])->name('home');
 Route::get('/index', [QuestionController::class, 'index'])->name('questions.index');
 
-Route::post('questions/store', [QuestionController::class, 'store'])->name('questions.store');
+Route::post('questions/store', [QuestionController::class, 'store'])->middleware('throttle:questions')->name('questions.store');
 
 Route::put('questions/{question}', [QuestionController::class, 'update'])->name('questions.update');
 
