@@ -46,7 +46,7 @@ Route::post('Auth/register', [AuthController::class, 'register'])->name('Auth.re
 
 Route::post('Auth/login', [AuthController::class, 'login'])->name('Auth.login')->middleware('guest');
 
-Route::get('Auth/logout', [AuthController::class, 'logout'])->name('Auth.logout');
+Route::post('Auth/logout', [AuthController::class, 'logout'])->middleware('auth')->name('Auth.logout');
 
 
 Route::get('/', [QuestionController::class, 'index'])->name('home');

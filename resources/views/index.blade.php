@@ -272,7 +272,10 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <a href="{{ route('Auth.logout') }}" class="btn btn-primary">تسجيل الخروج</a>
+                    <form action="{{ route('Auth.logout') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-primary">تسجيل الخروج</button>
+                    </form>
                 </div>
             </div>
         </div>
