@@ -15,11 +15,13 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::updateOrCreate([
-            'name' => 'Abdallah Awadallah',
-            'email' => 'abdallahhamada2103@gmail.com',
-            'password' => bcrypt('12345678'),
-            'privilege_level' => '2',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'abdallahhamada2103@gmail.com'],
+            [
+                'name' => 'Abdallah Awadallah',
+                'password' => bcrypt('12345678'),
+                'privilege_level' => 3,
+            ]
+        );
     }
 }
