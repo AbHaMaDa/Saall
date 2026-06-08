@@ -370,6 +370,22 @@ console.log("[saall] script revision 2 loaded");
             'button[type="submit"], input[type="submit"], button:not([type])'
         );
         if (btn && btn.form) lastClickedSubmitter = btn;
+
+        // Opt-in spinner for non-form actions like the 404 home / back
+        // buttons — any element with data-loading="true" gets the same
+        // loading style on click. Skip modified clicks (open-in-new-tab)
+        // and middle-clicks so they navigate normally.
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+            return;
+        }
+        const optIn = e.target.closest('[data-loading="true"]');
+        if (optIn && !optIn.classList.contains("is-loading")) {
+            optIn.classList.add("is-loading");
+            optIn.setAttribute("aria-busy", "true");
+            if ("disabled" in optIn) optIn.disabled = true;
+            // Safety net: navigation should replace the DOM long before this.
+            setTimeout(() => clearLoading(optIn), 15000);
+        }
     }, true);
 
     document.addEventListener("submit", (e) => {

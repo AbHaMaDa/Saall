@@ -16,11 +16,11 @@
             </p>
 
             <div class="error-actions">
-                <a href="{{ url('/') }}" class="btn btn-primary">
+                <a href="{{ url('/') }}" class="btn btn-primary" data-loading="true">
                     <i class="fa-solid fa-house"></i>
                     العودة للرئيسية
                 </a>
-                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                <button type="button" class="btn btn-secondary" data-loading="true" onclick="history.back()">
                     <i class="fa-solid fa-arrow-right"></i>
                     الرجوع للخلف
                 </button>
