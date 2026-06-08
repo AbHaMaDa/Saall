@@ -531,6 +531,8 @@ body {
     padding: 15px;
     border-radius: 12px;
     border-right: 3px solid #8b4513;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
 }
 
 .answer-section {
@@ -553,6 +555,8 @@ body {
     padding: 15px;
     border-radius: 12px;
     border-right: 3px solid #2d5016;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
 }
 
 .answer-meta {
@@ -626,6 +630,8 @@ body {
     color: #5a4a3a;
     margin-bottom: 8px;
     font-size: 1.1rem;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
 }
 
 .admin-question-meta {
