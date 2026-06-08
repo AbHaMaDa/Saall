@@ -4,6 +4,18 @@
     <div class="signing-container">
         <h2>اعد تعيين كلمة المرور</h2>
 
+        @if (session('status'))
+            <div class="alert alert-success">{{ session('status') }}</div>
+        @endif
+
+        @if ($errors->any() && ! $errors->has('email') && ! $errors->has('password') && ! $errors->has('password_confirmation'))
+            <div class="alert alert-danger">
+                @foreach ($errors->all() as $error)
+                    <p class="m-0">{{ $error }}</p>
+                @endforeach
+            </div>
+        @endif
+
         <form action="{{ route('password.update') }}" method="POST">
             @csrf
 

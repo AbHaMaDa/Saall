@@ -28,9 +28,12 @@ class ResetPassword extends Controller
 
 
 
-    public function passwordReset(string $token)
+    public function passwordReset(Request $request, string $token)
     {
-        return view('auth.reset-password', ['token' => $token]);
+        return view('auth.reset-password', [
+            'token' => $token,
+            'email' => $request->query('email'),
+        ]);
     }
 
 
@@ -55,7 +58,7 @@ class ResetPassword extends Controller
         }
     );
 
-    return $status === Password::PasswordReset
+    return $status === Password::PASSWORD_RESET
         ? redirect()->route('login')->with('status', __($status))
         : back()->withErrors(['email' => [__($status)]]);
     }
