@@ -178,8 +178,13 @@
                     <div class="card">
 
                         <div id="admin-panel" class="admin-panel ">
-                            <div class="admin-header">
+                            <div class="admin-header d-flex justify-content-between align-items-center">
                                 <h2>إدارة الأسئلة</h2>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#usersManagementModal">
+                                    <i class="fa-solid fa-users"></i>
+                                    إدارة المستخدمين
+                                </button>
                             </div>
                             @if ($unAnsweredQuestions->count() > 0)
                                 @foreach ($questions as $question)
@@ -273,6 +278,94 @@
         </div>
     </div>
 
+
+    <!-- Users Management Modal -->
+    @auth
+        @if (Auth::user()->privilege_level === 2 || Auth::user()->privilege_level === 3)
+            <div class="modal fade" id="usersManagementModal" tabindex="-1" aria-labelledby="usersManagementModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h1 class="modal-title fs-5" id="usersManagementModalLabel">قائمة المستخدمين</h1>
+                        </div>
+                        <div class="modal-body">
+                            @if ($users->count() > 0)
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle text-center">
+                                        <thead>
+                                            <tr>
+                                                <th>الاسم</th>
+                                                <th>البريد الإلكتروني</th>
+                                                <th>الصلاحية</th>
+                                                <th>إجراء</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($users as $u)
+                                                @php
+                                                    $level = (int) $u->privilege_level;
+                                                    $isSelf = Auth::id() === $u->id;
+                                                @endphp
+                                                <tr>
+                                                    <td>{{ $u->name }}</td>
+                                                    <td>{{ $u->email }}</td>
+                                                    <td>
+                                                        @if ($level === 3)
+                                                            <span class="badge bg-warning text-dark">مالك</span>
+                                                        @elseif ($level === 2)
+                                                            <span class="badge bg-success">مشرف</span>
+                                                        @else
+                                                            <span class="badge bg-secondary">مستخدم</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if ($level === 3 || $isSelf)
+                                                            <span class="text-muted">—</span>
+                                                        @elseif ($level === 1)
+                                                            <form action="{{ route('users.promote', $u->id) }}"
+                                                                method="POST" class="d-inline">
+                                                                @csrf
+                                                                @method('PATCH')
+                                                                <button type="submit" class="btn btn-sm btn-success">
+                                                                    <i class="fa-solid fa-arrow-up"></i>
+                                                                    ترقية إلى مشرف
+                                                                </button>
+                                                            </form>
+                                                        @elseif ($level === 2 && Auth::user()->privilege_level === 3)
+                                                            <form action="{{ route('users.demote', $u->id) }}"
+                                                                method="POST" class="d-inline">
+                                                                @csrf
+                                                                @method('PATCH')
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                    <i class="fa-solid fa-arrow-down"></i>
+                                                                    إنزال إلى مستخدم
+                                                                </button>
+                                                            </form>
+                                                        @else
+                                                            <span class="text-muted">—</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div class="empty-state">
+                                    <p>لا يوجد مستخدمون.</p>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endauth
 
     @foreach ($questions as $question)
         <!-- Modal deleteUnanswer -->

@@ -24,7 +24,14 @@ class QuestionController extends Controller
             ->where('is_answered', true)
             ->orderBy('created_at', 'desc')
             ->get();
-        return view('index', compact('questions', 'answeredQuestions', 'unAnsweredQuestions', 'userQuestions', 'answeredUserQuestions'));
+
+        $users = collect();
+        $actor = Auth::user();
+        if ($actor && in_array((int) $actor->privilege_level, [2, 3], true)) {
+            $users = User::orderByDesc('privilege_level')->orderBy('name')->get();
+        }
+
+        return view('index', compact('questions', 'answeredQuestions', 'unAnsweredQuestions', 'userQuestions', 'answeredUserQuestions', 'users'));
     }
 
     /**

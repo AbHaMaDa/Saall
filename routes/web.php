@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\ResetPassword;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -68,3 +69,6 @@ Route::delete('questions/{question}', [QuestionController::class, 'destroy'])->n
 Route::get('/search', [QuestionController::class, 'search'])->name('questions.search');
 
 Route::get('/search/visitor', [QuestionController::class, 'visitorSearch'])->name('questions.visitorSearch');
+
+Route::patch('admin/users/{user}/promote', [UserController::class, 'promote'])->name('users.promote');
+Route::patch('admin/users/{user}/demote', [UserController::class, 'demote'])->name('users.demote');
