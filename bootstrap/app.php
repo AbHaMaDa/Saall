@@ -31,4 +31,8 @@ if ($storagePath = $_SERVER['APP_STORAGE_PATH'] ?? getenv('APP_STORAGE_PATH')) {
     $app->useStoragePath($storagePath);
 }
 
+if ($bootstrapPath = $_SERVER['APP_BOOTSTRAP_PATH'] ?? getenv('APP_BOOTSTRAP_PATH')) {
+    $app->useBootstrapPath($bootstrapPath);
+}
+
 return $app;
