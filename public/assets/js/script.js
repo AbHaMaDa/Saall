@@ -197,6 +197,7 @@ if (searchFormMine) {
 // تنسيق التاريخ والوقت بالعربية: YYYY-MM-DD H:MM ص/م بأرقام عربية
 function formatArabicDateTime(date) {
     const pad = (n) => String(n).padStart(2, "0");
+    const toArabic = (s) => s.replace(/[0-9]/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
     const y = date.getFullYear();
     const mo = pad(date.getMonth() + 1);
     const d = pad(date.getDate());
@@ -204,9 +205,11 @@ function formatArabicDateTime(date) {
     const m = pad(date.getMinutes());
     const suffix = h < 12 ? "ص" : "م";
     const h12 = h % 12 === 0 ? 12 : h % 12;
-    const western = `${y}-${mo}-${d} ${h12}:${m}`;
-    const arabic = western.replace(/[0-9]/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
-    return `${arabic} ${suffix}`;
+    const arabicDate = toArabic(`${y}-${mo}-${d}`);
+    const arabicTime = toArabic(`${h12}:${m}`);
+    // Three non-breaking spaces between date and time so HTML keeps them all.
+    const gap = "   ";
+    return `${arabicDate}${gap}${arabicTime} ${suffix}`;
 }
 
 // دالة عامة لعرض النتائج

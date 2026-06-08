@@ -31,13 +31,17 @@ class AppServiceProvider extends ServiceProvider
 
         Carbon::macro('arabicDateTime', function () {
             /** @var Carbon $this */
-            $suffix = $this->format('a') === 'am' ? 'ص' : 'م';
-            $western = $this->format('Y-m-d g:i');
-            $arabic = strtr($western, [
+            $digits = [
                 '0' => '٠', '1' => '١', '2' => '٢', '3' => '٣', '4' => '٤',
                 '5' => '٥', '6' => '٦', '7' => '٧', '8' => '٨', '9' => '٩',
-            ]);
-            return $arabic . ' ' . $suffix;
+            ];
+            $date = strtr($this->format('Y-m-d'), $digits);
+            $time = strtr($this->format('g:i'), $digits);
+            $suffix = $this->format('a') === 'am' ? 'ص' : 'م';
+            // Three non-breaking spaces separate the date and time so HTML
+            // doesn't collapse them into one.
+            $gap = "\u{00A0}\u{00A0}\u{00A0}";
+            return $date . $gap . $time . ' ' . $suffix;
         });
     }
 }
