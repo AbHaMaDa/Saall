@@ -194,7 +194,7 @@ if (searchFormMine) {
     });
 }
 
-// تنسيق التاريخ والوقت بالعربية: YYYY-MM-DD H:MM ص/م
+// تنسيق التاريخ والوقت بالعربية: YYYY-MM-DD H:MM ص/م بأرقام عربية
 function formatArabicDateTime(date) {
     const pad = (n) => String(n).padStart(2, "0");
     const y = date.getFullYear();
@@ -204,7 +204,9 @@ function formatArabicDateTime(date) {
     const m = pad(date.getMinutes());
     const suffix = h < 12 ? "ص" : "م";
     const h12 = h % 12 === 0 ? 12 : h % 12;
-    return `${y}-${mo}-${d} ${h12}:${m} ${suffix}`;
+    const western = `${y}-${mo}-${d} ${h12}:${m}`;
+    const arabic = western.replace(/[0-9]/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
+    return `${arabic} ${suffix}`;
 }
 
 // دالة عامة لعرض النتائج
