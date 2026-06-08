@@ -318,3 +318,57 @@ document.addEventListener("DOMContentLoaded", function () {
     const savedTab = localStorage.getItem("Qtab");
     toggleAnswers(savedTab);
 });
+
+// ===== Global loading state on form submit =====
+// Turns the clicked submit button (or fallback first submit) into a spinner
+// for any form on the page — sending a question, deleting, promoting, demoting,
+// login, register, password reset, etc. No per-form wiring needed.
+(function () {
+    let lastClickedSubmitter = null;
+
+    document.addEventListener("click", (e) => {
+        const btn = e.target.closest(
+            'button[type="submit"], input[type="submit"], button:not([type])'
+        );
+        if (btn && btn.form) lastClickedSubmitter = btn;
+    }, true);
+
+    document.addEventListener("submit", (e) => {
+        const form = e.target;
+        if (!(form instanceof HTMLFormElement)) return;
+        if (form.dataset.noLoading === "true") return;
+
+        const submitter =
+            e.submitter ||
+            (lastClickedSubmitter && lastClickedSubmitter.form === form
+                ? lastClickedSubmitter
+                : null) ||
+            form.querySelector(
+                'button[type="submit"], input[type="submit"], button:not([type])'
+            );
+
+        if (!submitter || submitter.classList.contains("is-loading")) return;
+
+        submitter.classList.add("is-loading");
+        submitter.setAttribute("aria-busy", "true");
+        submitter.disabled = true;
+
+        // Safety net: re-enable after 15s in case the request stalls
+        // and the page never navigates.
+        setTimeout(() => {
+            submitter.classList.remove("is-loading");
+            submitter.removeAttribute("aria-busy");
+            submitter.disabled = false;
+        }, 15000);
+    }, true);
+
+    // Back/forward cache restores DOM with disabled buttons — clear it.
+    window.addEventListener("pageshow", (e) => {
+        if (!e.persisted) return;
+        document.querySelectorAll(".is-loading").forEach((el) => {
+            el.classList.remove("is-loading");
+            el.removeAttribute("aria-busy");
+            if ("disabled" in el) el.disabled = false;
+        });
+    });
+})();
