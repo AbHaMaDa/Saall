@@ -123,7 +123,7 @@
                                             data-bs-target="#exampleModalDeleteUnanswer{{ $answeredQuestion['id'] }}"></i>
                                     @endif
                                 @endauth
-                                <span class="answer-date">{{ $answeredQuestion['created_at']->format('Y-m-d \\\ H:i:s') }}</span>
+                                <span class="answer-date">{{ $answeredQuestion['created_at']->arabicDateTime() }}</span>
                             </div>
                         </div>
                     @endforeach
@@ -157,7 +157,7 @@
                                         @endif
                                     @endauth
                                     <span
-                                        class="answer-date">{{ $answeredUserQuestion['created_at']->format('Y-m-d \\\ H:i:s') }}</span>
+                                        class="answer-date">{{ $answeredUserQuestion['created_at']->arabicDateTime() }}</span>
                                 </div>
                             </div>
                     @endforeach
@@ -197,7 +197,7 @@
                                                     <div class="admin-question-info">
                                                         <div class="admin-question-text">{{ $question['content'] }}</div>
                                                         <div class="admin-question-meta">
-                                                            {{ $question['created_at']->format('Y-m-d \\\ H:i:s') }}
+                                                            {{ $question['created_at']->arabicDateTime() }}
                                                         </div>
                                                     </div>
                                                 </div>

@@ -194,6 +194,19 @@ if (searchFormMine) {
     });
 }
 
+// تنسيق التاريخ والوقت بالعربية: YYYY-MM-DD H:MM ص/م
+function formatArabicDateTime(date) {
+    const pad = (n) => String(n).padStart(2, "0");
+    const y = date.getFullYear();
+    const mo = pad(date.getMonth() + 1);
+    const d = pad(date.getDate());
+    const h = date.getHours();
+    const m = pad(date.getMinutes());
+    const suffix = h < 12 ? "ص" : "م";
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    return `${y}-${mo}-${d} ${h12}:${m} ${suffix}`;
+}
+
 // دالة عامة لعرض النتائج
 function fetchAnswers(url, containerId) {
     fetch(url)
@@ -217,6 +230,7 @@ function fetchAnswers(url, containerId) {
                     ? `<i class="fa-solid fa-trash icon-trash" data-bs-toggle="modal" data-bs-target="#exampleModalDeleteUnanswer${q.id}"></i>`
                     : "";
                 const dateObj = new Date(q.created_at);
+                const formattedDate = formatArabicDateTime(dateObj);
 
                 container.innerHTML += `
                     <div class="answer-item">
@@ -230,7 +244,7 @@ function fetchAnswers(url, containerId) {
                         </div>
                         <div class="answer-meta d-flex justify-content-between align-items-center">
                             ${trashIcon}
-                            <span class="answer-date">${dateObj.toLocaleDateString()}  \\\  ${dateObj.toLocaleTimeString()}</span>
+                            <span class="answer-date">${formattedDate}</span>
                         </div>
                     </div>
                     ${

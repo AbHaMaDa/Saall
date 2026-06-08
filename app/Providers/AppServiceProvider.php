@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Carbon\Carbon;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -27,5 +28,11 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinute(5)->by($visitorKey($r)),
             Limit::perHour(30)->by($visitorKey($r)),
         ]);
+
+        Carbon::macro('arabicDateTime', function () {
+            /** @var Carbon $this */
+            $suffix = $this->format('a') === 'am' ? 'ص' : 'م';
+            return $this->format('Y-m-d g:i') . ' ' . $suffix;
+        });
     }
 }
